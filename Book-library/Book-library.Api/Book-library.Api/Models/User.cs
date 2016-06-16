@@ -20,6 +20,7 @@ namespace BookLibrary.Api.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public List<Email> Emails { get; set; }
+        //public Email Email { get; set; }
         [StringLength(450)]
         [Index(IsUnique = true)]
         public string UserName { get; set; }
@@ -36,8 +37,16 @@ namespace BookLibrary.Api.Models
             {
                 Emails.Find(e => e.IsActive).IsActive = false;
             }
+            //Email.IsActive = false;
 
             Emails.Find(e => e.Value == newEmailValue).IsActive = true;
+            //var email = new Email();
+            //email.IsConfirmed = true;
+            //email.IsActive = true;
+            //email.Value = newEmailValue;
+            //email.User = this;
+
+            //Email = email;
 
             Credentials.Logins.Find(l => l.Type == LoginType.Email).Value = newEmailValue;
         }

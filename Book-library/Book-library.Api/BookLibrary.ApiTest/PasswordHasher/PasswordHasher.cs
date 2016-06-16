@@ -3,9 +3,9 @@ using System.Text;
 
 namespace BookLibrary.ApiTest
 {
-    class PasswordHasher
+    class PasswordHasher : IPasswordHasher
     {
-        public static string GetMd5Hash(string source)
+        public string GetHash(string source)
         {
             using (MD5 md5Hash = MD5.Create())
             {

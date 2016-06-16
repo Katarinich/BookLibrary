@@ -7,24 +7,25 @@ namespace BookLibrary.ApiTest.Services
     {
         private IConfirmationCodeManager _codeManager;
         private IEmailManager _emailManager;
+        private ICodeGenerator _codeGenerator;
 
-        public ConfirmationSenderService(IConfirmationCodeManager codeManager, IEmailManager emailManager)
+        public ConfirmationSenderService(IConfirmationCodeManager codeManager, IEmailManager emailManager, 
+            ICodeGenerator codeGenerator)
         {
             _codeManager = codeManager;
             _emailManager = emailManager;
+            _codeGenerator = codeGenerator;
         }
 
-        public bool SendConfirmation(string emailValue, ConfirmationCodeType type)
+        public void SendConfirmation(string emailValue, ConfirmationCodeType type)
         {
-            var code = CodeGenerator.Generate(type);
+            var code = _codeGenerator.GenerateCode(type);
 
             var email = _emailManager.GetEmailByValue(emailValue);
 
-            if (email == null) return false;
+            if (email == null) throw new EmailNotFoundException(emailValue);
 
             _codeManager.SaveCode(code, email);
-
-            return true;
         }
     }
 }

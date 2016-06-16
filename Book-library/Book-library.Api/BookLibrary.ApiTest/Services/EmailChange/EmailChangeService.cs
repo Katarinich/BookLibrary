@@ -1,6 +1,7 @@
 ﻿using BookLibrary.Api.Models;
 using BookLibrary.ApiTest.Exceptions.CodeExceptions;
-using BookLibrary.ApiTest.Services.ConfirmationCode;
+using BookLibrary.ApiTest.Managers;
+
 
 namespace BookLibrary.ApiTest.Services
 {
@@ -8,45 +9,57 @@ namespace BookLibrary.ApiTest.Services
     {
         private IConfirmationCodeService _confirmationCodeService;
         private IConfirmationSenderService _senderService;
+        private IUserManager _userManager;
         private IEmailConfirmationService _emailConfirmationService;
 
-        public EmailChangeService(IConfirmationCodeService confirmationCodeService, 
+        public EmailChangeService(IConfirmationCodeService confirmationCodeService, IUserManager userManager,
             IEmailConfirmationService emailConfirmationService, IConfirmationSenderService confirmationSenderService)
         {
+            _userManager = userManager;
+            _emailConfirmationService = emailConfirmationService;
             _confirmationCodeService = confirmationCodeService;
-            _emailConfirmationService = emailConfirmationService; 
             _senderService = confirmationSenderService;
         }
 
-        public bool SendToNewEmail(string newEmailValue, string codeValue)
+        public void InitiateChangeEmailProcess(int userId, string newEmailValue)
         {
-            if (_confirmationCodeService.IsCodeValid(codeValue))
-            {
-                var user = _confirmationCodeService.GetRelatedUser(codeValue);
+            var user = _userManager.GetUserById(userId);
+            _confirmationCodeService.DeactivateCodesByType(user, ConfirmationCodeType.EmailChange);
 
-                var email = new Email();
-                email.Value = newEmailValue;
-                email.IsConfirmed = false;
-                email.IsActive = false;
+            var newEmail = new Email();
+            newEmail.IsActive = false;
+            newEmail.IsConfirmed = false;
+            newEmail.User = user;
+            newEmail.Value = newEmailValue;
 
-                user.AddEmail(email);
+            user.AddEmail(newEmail);
+            _userManager.UpdateUser();
 
-                _confirmationCodeService.DeactivateCode(codeValue);
-
-                _senderService.SendConfirmation(newEmailValue, ConfirmationCodeType.EmailChange);
-            }
-            else throw new CodeIsNotValidException("Code is not valid");
-
-            return true;
+            _senderService.SendConfirmation(user.Email, ConfirmationCodeType.EmailChange);
         }
 
-        public void ChangeEmail(string newEmailValue, string codeValue)
+        public void SendConfirmationToNewEmail(string codeValue)
         {
-            if (_emailConfirmationService.TryAcceptConfirmation(codeValue, newEmailValue))
+            _confirmationCodeService.ValidateCode(codeValue);
+
+            _confirmationCodeService.DeactivateCode(codeValue);
+
+            var user = _confirmationCodeService.GetRelatedUser(codeValue);
+            var newEmailValue = user.Emails.FindLast(x => x.IsConfirmed == false).Value;
+
+            _senderService.SendConfirmation(newEmailValue, ConfirmationCodeType.EmailConfirmation);
+        }
+
+        public void ChangeEmail(string codeValue)
+        {
+            if (_emailConfirmationService.TryAcceptConfirmation(codeValue))
             {
                 var user = _confirmationCodeService.GetRelatedUser(codeValue);
+                var newEmailValue = _confirmationCodeService.GetCodeByValue(codeValue).Email.Value;
 
                 user.ChangeEmailTo(newEmailValue);
+
+                _confirmationCodeService.DeactivateCode(codeValue);
             }
 
             else throw new CodeIsNotValidException(codeValue);

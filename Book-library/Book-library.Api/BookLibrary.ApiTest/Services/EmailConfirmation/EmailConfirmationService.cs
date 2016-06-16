@@ -1,5 +1,5 @@
 ﻿using BookLibrary.ApiTest.Exceptions.CodeExceptions;
-using BookLibrary.ApiTest.Services.ConfirmationCode;
+using System;
 
 namespace BookLibrary.ApiTest.Services
 {
@@ -12,17 +12,23 @@ namespace BookLibrary.ApiTest.Services
             _confirmationCodeService = confirmationCodeService;
         }
 
-        public bool TryAcceptConfirmation(string codeValue, string emailValue)
+        public bool TryAcceptConfirmation(string codeValue)
         {
-            if (_confirmationCodeService.IsCodeValid(codeValue))
+            try
             {
-                var user = _confirmationCodeService.GetRelatedUser(codeValue);
-
-                user.Emails.Find(e => e.Value == emailValue).IsConfirmed = true;
-
-                _confirmationCodeService.DeactivateCode(codeValue);
+                _confirmationCodeService.ValidateCode(codeValue);
             }
-            else return false;
+            catch(Exception ex) 
+                when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeIsNotValidException)
+            {
+                return false;
+            }
+            var user = _confirmationCodeService.GetRelatedUser(codeValue);
+            var emailValue = _confirmationCodeService.GetCodeByValue(codeValue).Email.Value;
+
+            user.Emails.Find(e => e.Value == emailValue).IsConfirmed = true;
+
+            _confirmationCodeService.DeactivateCode(codeValue);
 
             return true;
         }

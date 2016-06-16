@@ -8,7 +8,6 @@ using BookLibrary.ApiTest.Services;
 using BookLibrary.ApiTest.Exceptions.CodeExceptions;
 using BookLibrary.ApiTest.Exceptions.PasswordExceptions;
 using SimpleInjector;
-using BookLibrary.ApiTest.Services.ConfirmationCode;
 
 namespace BookLibrary.ApiTest.Tests
 {
@@ -26,8 +25,6 @@ namespace BookLibrary.ApiTest.Tests
         {
             _container = new Container();
 
-            //container.Options.DefaultScopedLifestyle = new LifetimeScopeLifestyle();
-
             _container.Register<BookLibraryContext, BookLibraryContext>(Lifestyle.Singleton);
             _container.Register<IUserManager, UserManager>(Lifestyle.Singleton);
             _container.Register<IConfirmationCodeManager, ConfirmationCodeManager>(Lifestyle.Singleton);
@@ -37,6 +34,7 @@ namespace BookLibrary.ApiTest.Tests
             _container.Register<IConfirmationCodeService, ConfirmationCodeService>();
             _container.Register<IEmailConfirmationService, EmailConfirmationService>();
             _container.Register<IConfirmationSenderService, ConfirmationSenderService>();
+            _container.Register<IPasswordHasher, PasswordHasher>();
 
             _context = _container.GetInstance<BookLibraryContext>();
             var userBuilder = new UserBuilder();
@@ -50,7 +48,7 @@ namespace BookLibrary.ApiTest.Tests
             var confirmationSenderService = _container.GetInstance<ConfirmationSenderService>();
 
             var randomUserDraftGenerator = new RandomUserDraftGenerator();
-            var userDraft = randomUserDraftGenerator.GenerateRandomUserDraft();
+            var userDraft = randomUserDraftGenerator.GenerateUserDraft();
 
             var user = userBuilder.BuildUser(userDraft);
             user.Emails[0].IsConfirmed = true;
@@ -70,13 +68,6 @@ namespace BookLibrary.ApiTest.Tests
 
             _context.Codes.ToList()[2].ExpirationDate = new DateTimeOffset(1971, 1, 1, 0, 0, 0, 0, TimeSpan.Zero);
 
-            var email = new Email();
-            email.IsActive = false;
-            email.IsConfirmed = true;
-            email.Value = "a@mail.ru";
-
-            user.AddEmail(email);
-
             _context.SaveChanges();
         }
 
@@ -92,7 +83,7 @@ namespace BookLibrary.ApiTest.Tests
             var userBuilder = new UserBuilder();
 
             var randomUserDraftGenerator = new RandomUserDraftGenerator();
-            var userDraft = randomUserDraftGenerator.GenerateRandomUserDraft();
+            var userDraft = randomUserDraftGenerator.GenerateUserDraft();
 
             var user = userBuilder.BuildUser(userDraft);
 
@@ -147,34 +138,37 @@ namespace BookLibrary.ApiTest.Tests
         [TestMethod]
         public void LoginPositiveTest()
         {
-            var loginService = _container.GetInstance<LoginService>();
-
             var user = _userManager.GetUserById(1);
             var passwordValue = "123456";
 
-            var credentialsDraft = new CredentialsDraft(user.UserName, passwordValue);
-            Assert.IsNotNull(loginService.Authentification(credentialsDraft));
+            Assert.IsNotNull(AuthentificationTest(user.UserName, passwordValue));
         }
 
         [TestMethod]
         public void LoginFullNegativeTest()
         {
-            var loginService = _container.GetInstance<LoginService>();
-
-            var credentialsDraft = new CredentialsDraft("i.ivanov", "1234556");
-
-            Assert.IsNull(loginService.Authentification(credentialsDraft));
+            Assert.IsNull(AuthentificationTest("", ""));
         }
 
         [TestMethod]
         public void LoginPasswordNegativeTest()
         {
-            var loginService = _container.GetInstance<LoginService>();
-
             var user = _userManager.GetUserById(1);
 
-            var credentialsDraft = new CredentialsDraft(user.UserName, "123");
-            Assert.IsNull(loginService.Authentification(credentialsDraft));
+            Assert.IsNull(AuthentificationTest(user.UserName, ""));
+        }
+
+        [TestMethod]
+        public void AuthentificationLoginNegativeTest()
+        {
+            Assert.IsNull(AuthentificationTest("", "123456"));
+        }
+
+        public User AuthentificationTest(string userName, string password)
+        {
+            var loginService = _container.GetInstance<AuthentificationService>();
+            var credentialsDraft = new CredentialsDraft(userName, password);
+            return loginService.Authentificate(credentialsDraft);
         }
 
         [TestMethod]
@@ -183,28 +177,30 @@ namespace BookLibrary.ApiTest.Tests
             var confirmationSenderService = _container.GetInstance<ConfirmationSenderService>();
 
             var emailValue = _context.Emails.ToList()[0].Value;
-            Assert.IsTrue(confirmationSenderService.SendConfirmation(emailValue, ConfirmationCodeType.EmailConfirmation));
+            confirmationSenderService.SendConfirmation(emailValue, ConfirmationCodeType.EmailConfirmation);
         }
 
         [TestMethod]
+        [ExpectedException(typeof(EmailNotFoundException))]
         public void SendConfirmationNegativeTest()
         {
             var confirmationSenderService = _container.GetInstance<ConfirmationSenderService>();
 
             var emailValue = "wredfds";
-            Assert.IsFalse(confirmationSenderService.SendConfirmation(emailValue, ConfirmationCodeType.EmailConfirmation));
+            confirmationSenderService.SendConfirmation(emailValue, ConfirmationCodeType.EmailConfirmation);
         }
 
         [TestMethod]
         public void RecoverPasswordPositiveTest()
         {
             var passwordRecoveryService = _container.GetInstance<PasswordRecoveryService>();
+            var passwordHasher = _container.GetInstance<PasswordHasher>();
 
             var newPasswordValue = "123456";
 
             passwordRecoveryService.RecoverPassword(newPasswordValue, _context.Codes.ToList()[0].Value);
 
-            Assert.AreEqual(PasswordHasher.GetMd5Hash(newPasswordValue), _context.Passwords.ToList()[1].Value);
+            Assert.AreEqual(passwordHasher.GetHash(newPasswordValue), _context.Passwords.ToList()[1].Value);
             Assert.IsFalse(_context.Passwords.ToList()[0].IsActive);
             Assert.AreEqual(_context.Users.ToList()[0].UserId, _context.Passwords.ToList()[1].Credentials.User.UserId);
         }
@@ -243,12 +239,13 @@ namespace BookLibrary.ApiTest.Tests
         public void ChangePasswordPositiveTest()
         {
             var passwordChangeService = _container.GetInstance<PasswordChangeService>();
+            var passwordHasher = _container.GetInstance<PasswordHasher>();
             var oldPassword = _context.Passwords.ToList()[0];
             var newPasswordValue = "1234567";
 
             passwordChangeService.ChangePassword(_context.Users.ToList()[0].UserId, oldPassword.Value, newPasswordValue);
 
-            Assert.AreEqual(PasswordHasher.GetMd5Hash(newPasswordValue), _context.Passwords.ToList()[1].Value);
+            Assert.AreEqual(passwordHasher.GetHash(newPasswordValue), _context.Passwords.ToList()[1].Value);
             Assert.IsFalse(_context.Passwords.ToList()[0].IsActive);
             Assert.AreEqual(_context.Users.ToList()[0].UserId, _context.Passwords.ToList()[1].Credentials.User.UserId);
         }
@@ -278,22 +275,25 @@ namespace BookLibrary.ApiTest.Tests
         public void SendToNewEmailTest()
         {
             var emailChangeService = _container.GetInstance<EmailChangeService>();
- 
-            string newEmailValue = "a@gmail.com";
-            emailChangeService.SendToNewEmail(newEmailValue, _context.Codes.ToList()[0].Value);
 
-            Assert.AreEqual(_context.Emails.ToList()[2].Value, newEmailValue);
-            Assert.IsFalse(_context.Emails.ToList()[2].IsActive);
-            Assert.IsFalse(_context.Emails.ToList()[2].IsConfirmed);
+            emailChangeService.InitiateChangeEmailProcess(1, "a@gmail.com");
+            emailChangeService.SendConfirmationToNewEmail(_context.Codes.ToList()[3].Value);
+
+            Assert.AreEqual(_context.Emails.ToList()[1].Value, "a@gmail.com");
+            Assert.IsFalse(_context.Emails.ToList()[1].IsActive);
+            Assert.IsFalse(_context.Emails.ToList()[1].IsConfirmed);
         }
 
         [TestMethod]
         public void ChangeEmailTest()
         {
             var emailChangeService = _container.GetInstance<EmailChangeService>();
-            var newEmailValue = _context.Emails.ToList()[1].Value;
 
-            emailChangeService.ChangeEmail(newEmailValue, _context.Codes.ToList()[0].Value);
+            emailChangeService.InitiateChangeEmailProcess(1, "a@gmail.com");
+
+            emailChangeService.SendConfirmationToNewEmail(_context.Codes.ToList()[3].Value);
+
+            emailChangeService.ChangeEmail( _context.Codes.ToList()[4].Value);
 
             _context.SaveChanges();
 

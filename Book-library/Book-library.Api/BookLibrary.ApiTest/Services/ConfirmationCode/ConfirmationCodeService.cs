@@ -1,8 +1,6 @@
-﻿using System;
-using BookLibrary.Api.Models;
-using BookLibrary.ApiTest.Exceptions.CodeExceptions;
+﻿using BookLibrary.Api.Models;
 
-namespace BookLibrary.ApiTest.Services.ConfirmationCode
+namespace BookLibrary.ApiTest.Services
 {
     class ConfirmationCodeService : IConfirmationCodeService
     {
@@ -28,20 +26,27 @@ namespace BookLibrary.ApiTest.Services.ConfirmationCode
             return code.Email.User;
         }
 
-        public bool IsCodeValid(string codeValue)
+        public void ValidateCode(string codeValue)
         {
             var code = _confirmationCodeManager.GetConfirmationCodeByValue(codeValue);
 
-            try
-            {
-                _codeValidationRule.ValidateCode(code);
-            }
-            catch (Exception ex) when (ex is CodeIsNotExistException || ex is CodeIsNotActiveException || ex is CodeExpirationDateIsUpException)
-            {
-                return false;
-            }
+            _codeValidationRule.ValidateCode(code);
+        }
 
-            return true;
+        public void DeactivateCodesByType(User user, ConfirmationCodeType type)
+        {
+            var codes = _confirmationCodeManager.GetConfirmationCodesByUserId(user.UserId);
+
+            foreach(var code in codes)
+            {
+                if(code.Type == type)
+                    code.IsActive = false;
+            }
+        }
+
+        public ConfirmationCode GetCodeByValue(string codeValue)
+        {
+            return _confirmationCodeManager.GetConfirmationCodeByValue(codeValue);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace BookLibrary.ApiTest
 {
-    class RandomUserDraftGenerator : IRandomUserDraftGenerator
+    class RandomUserDraftGenerator : IUserDraftGenerator
     {
-        public UserDraft GenerateRandomUserDraft()
+        public UserDraft GenerateUserDraft()
         {
             var userDraft = new UserDraft();
 

@@ -2,6 +2,6 @@
 {
     interface IEmailConfirmationService
     {
-        bool TryAcceptConfirmation(string codeValue, string emailValue);
+        bool TryAcceptConfirmation(string codeValue);
     }
 }

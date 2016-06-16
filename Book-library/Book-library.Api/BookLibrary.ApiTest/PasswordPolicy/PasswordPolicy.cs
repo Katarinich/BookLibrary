@@ -7,6 +7,13 @@ namespace BookLibrary.ApiTest
     {
         private const int LAST_PASSWORDS_COUNT = 3;
         private const int MIN_PASSWORD_LENGTH = 8;
+        private IPasswordHasher _passwordHasher;
+
+        public PasswordPolicy(IPasswordHasher passwordHasher)
+        {
+            _passwordHasher = passwordHasher;
+        }
+
         public bool SatisfiesPolicy(User user, string newPasswordValue)
         {
             if (newPasswordValue.Length < MIN_PASSWORD_LENGTH)
@@ -14,7 +21,7 @@ namespace BookLibrary.ApiTest
 
             var orderedPasswords = user.Credentials.Passwords.ToList().OrderByDescending(p => p.ExpirationDate);
             var lastPasswords = orderedPasswords.Take(LAST_PASSWORDS_COUNT);
-            var hashedNewPasswordValue = PasswordHasher.GetMd5Hash(newPasswordValue);
+            var hashedNewPasswordValue = _passwordHasher.GetHash(newPasswordValue);
 
             if (lastPasswords.ToList().FindAll(p => p.Value == hashedNewPasswordValue).Count > 0)
                 return false;

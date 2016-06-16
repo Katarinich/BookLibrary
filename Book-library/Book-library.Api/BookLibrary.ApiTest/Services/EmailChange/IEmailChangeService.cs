@@ -2,7 +2,10 @@
 {
     interface IEmailChangeService
     {
-        bool SendToNewEmail(string newEmailValue, string codeValue);
-        void ChangeEmail(string newEmailValue, string codeValue);
+        void SendConfirmationToNewEmail(string codeValue);
+
+        void ChangeEmail(string codeValue);
+
+        void InitiateChangeEmailProcess(int userId, string newEmailValue);
     }
 }

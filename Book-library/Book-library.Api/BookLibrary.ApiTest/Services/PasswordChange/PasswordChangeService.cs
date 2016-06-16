@@ -10,11 +10,13 @@ namespace BookLibrary.ApiTest.Services
     {
         private IUserManager _userManager;
         private IPasswordPolicy _passwordPolicy;
+        private IPasswordHasher _passwordHasher;
 
-        public PasswordChangeService(IUserManager userManager, IPasswordPolicy passwordPolicy)
+        public PasswordChangeService(IUserManager userManager, IPasswordPolicy passwordPolicy, IPasswordHasher passwordHasher)
         {
             _userManager = userManager;
             _passwordPolicy = passwordPolicy;
+            _passwordHasher = passwordHasher;
         }
 
         public void ChangePassword(int userId, string oldPasswordValue, string newPasswordValue)
@@ -31,7 +33,7 @@ namespace BookLibrary.ApiTest.Services
 
 
             var newPassword = new Password();
-            newPassword.Value = PasswordHasher.GetMd5Hash(newPasswordValue);
+            newPassword.Value = _passwordHasher.GetHash(newPasswordValue);
             newPassword.ExpirationDate = DateTimeOffset.Now.AddYears(1);
             newPassword.Credentials = user.Credentials;
             newPassword.IsActive = true;

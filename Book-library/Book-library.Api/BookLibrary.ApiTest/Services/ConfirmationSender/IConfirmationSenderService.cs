@@ -4,6 +4,6 @@ namespace BookLibrary.ApiTest.Services
 {
     interface IConfirmationSenderService
     {
-        bool SendConfirmation(string emailValue, ConfirmationCodeType type);
+        void SendConfirmation(string emailValue, ConfirmationCodeType type);
     }
 }

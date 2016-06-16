@@ -1,5 +1,6 @@
 ﻿using BookLibrary.Api.DAL;
 using BookLibrary.Api.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BookLibrary.ApiTest.Managers
@@ -29,6 +30,11 @@ namespace BookLibrary.ApiTest.Managers
                 .Include("Email.User.Credentials")
                 .Include("Email.User.Credentials.Passwords")
                 .FirstOrDefault(c => c.Value == codeValue);
+        }
+
+        public List<ConfirmationCode> GetConfirmationCodesByUserId(int userId)
+        {
+            return _context.Codes.ToList().FindAll(cc => cc.Email.User.UserId == userId);
         }
 
         public void UpdateCode()

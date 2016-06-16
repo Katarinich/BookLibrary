@@ -180,6 +180,7 @@
     <Compile Include="Models\ConfirmationCodeType.cs" />
     <Compile Include="Models\Credentials.cs" />
     <Compile Include="Models\Email.cs" />
+    <Compile Include="Models\EmailChangeRequest.cs" />
     <Compile Include="Models\LoginType.cs" />
     <Compile Include="Models\LoginName.cs" />
     <Compile Include="Models\MobilePhone.cs" />

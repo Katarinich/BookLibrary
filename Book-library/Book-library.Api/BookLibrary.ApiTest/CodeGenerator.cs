@@ -3,10 +3,10 @@ using System;
 
 namespace BookLibrary.ApiTest
 {
-    class CodeGenerator
+    class CodeGenerator : ICodeGenerator
     {
         private const int CODE_LENGTH = 8;
-        public static ConfirmationCode Generate(ConfirmationCodeType type)
+        public ConfirmationCode GenerateCode(ConfirmationCodeType type)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             var generator = new Generator();
