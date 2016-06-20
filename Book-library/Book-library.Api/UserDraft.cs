@@ -14,7 +14,7 @@ namespace BookLibrary.Api
         public string country { get; set; }
         public string state { get; set; }
         public string city { get; set; }
-        public string addresLine { get; set; }
+        public string addressLine { get; set; }
         public string zipCode { get; set; } 
     }
 }

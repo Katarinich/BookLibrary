@@ -1,11 +1,13 @@
-﻿import React, { Component } from 'react';
+﻿import React, { Component } from 'react'
 
-export default class Root extends Component {
-    render() {
-        return (
-            <div>
-            Hello World!
-            </div>
+import LoginSection from './LoginSection'
+
+export default class App extends Component {
+  render() {
+    return (
+      <div className="container">
+        <LoginSection />
+      </div>
     );
-}
+  }
 }

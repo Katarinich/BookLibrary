@@ -8,8 +8,7 @@ namespace BookLibrary.Api.Services
         private IConfirmationCodeManager _codeManager;
         private IEmailManager _emailManager;
         private ICodeGenerator _codeGenerator;
-        
-        public INotificationTransportService _notificationTransportService;
+        private INotificationTransportService _notificationTransportService;
 
         public ConfirmationSenderService(IConfirmationCodeManager codeManager, IEmailManager emailManager, 
             ICodeGenerator codeGenerator, INotificationTransportService notificationTransportService)
@@ -30,7 +29,7 @@ namespace BookLibrary.Api.Services
 
             _codeManager.SaveCode(code, email);
 
-            _notificationTransportService.SendNotification("", "");
+            _notificationTransportService.SendNotification(emailValue, code.Value);
         }
     }
 }
