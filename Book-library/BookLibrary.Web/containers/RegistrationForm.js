@@ -1,8 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react'
+import { connect } from 'react-redux'
 
-export default class RegistrationForm extends Component {
+import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
+
+import { registerUser } from '../actions'
+
+class RegistrationForm extends Component {
   handleSubmit(e) {
     e.preventDefault()
+
+    const { registerUser } = this.props
 
     var formData = {
       userName: $('[name=userName]').val(),
@@ -19,13 +26,7 @@ export default class RegistrationForm extends Component {
       password: $('[name=password]').val()
     }
 
-    fetch('http://localhost:51407/users/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
+    registerUser(formData)
   }
 
   render() {
@@ -35,14 +36,14 @@ export default class RegistrationForm extends Component {
           <label>Username: </label>
           <input type="text" className="form-control" name="userName" defaultValue="J.Doe" />
         </div>
-        <div className="form-group">
-          <label>First Name: </label>
-          <input type="text" className="form-control" name="firstName" defaultValue="Jane" />
-        </div>
-        <div className="form-group">
-          <label>Last Name: </label>
-          <input type="text" className="form-control" name="lastName" defaultValue="Doe" />
-        </div>
+        <FormGroup>
+          <ControlLabel>First Name</ControlLabel>
+          <FormControl type="text" name="firstName" defaultValue="Jane" />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Last Name</ControlLabel>
+          <FormControl type="text" name="lastName" defaultValue="Doe" />
+        </FormGroup>
         <div className="form-group">
           <label>Email: </label>
           <input type="email" className="form-control" name="email" defaultValue="jane.doe@example.com" />
@@ -79,8 +80,19 @@ export default class RegistrationForm extends Component {
           <label>Password: </label>
           <input type="password" className="form-control" name="password" />
         </div>
-        <button className="btn btn-primary" type="submit">Send</button>
+        <Button type="submit">
+          Submit
+        </Button>
       </form>
     )
   }
 }
+
+RegistrationForm.propTypes = {
+  registerUser: PropTypes.func.isRequired
+}
+
+export default connect(
+  () => ({}),
+  { registerUser }
+)(RegistrationForm)
