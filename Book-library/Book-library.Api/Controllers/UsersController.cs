@@ -1,7 +1,7 @@
-﻿using Book_library.Api.DTO;
+﻿using BookLibrary.Api.DTO;
 using BookLibrary.Api.Models;
 using BookLibrary.Api.Services;
-using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -25,6 +25,26 @@ namespace BookLibrary.Api.Controllers
             _autentificationService = authentificationSerice;
             _registrationService = registrationalService;
             _confirmationSenderService = confirmationalService;
+        }
+
+        [Route("")]
+        public IEnumerable<UserDTO> GetAllUsers()
+        {
+            var users = _userService.GetAllUsers();
+            List<UserDTO> usersDTO = new List<UserDTO>();
+
+            foreach(var user in users)
+            {
+                usersDTO.Add(new UserDTO()
+                {
+                    Id = user.UserId,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    UserName = user.UserName
+                });
+            }
+
+            return usersDTO;
         }
 
         [Route("signup")]

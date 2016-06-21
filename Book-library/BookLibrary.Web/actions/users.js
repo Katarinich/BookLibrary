@@ -59,10 +59,29 @@ function logoutUserSuccess() {
   }
 }
 
-function logoutUserFailure() {
+function logoutUserFailure(err) {
   return {
-    type: types.LOGOUT_USER_FAILURE
+    type: types.LOGOUT_USER_FAILURE,
+    err
   }
+}
+
+function getUsersRequest() {
+  return {
+    type: types.GET_USERS_REQUEST
+  }
+}
+
+function getUsersSuccess(users) {
+  return {
+    type: types.GET_USERS_SUCCESS,
+    users
+  }
+}
+
+function getUsersFailure(err) {
+  type: types.GET_USERS_FAILURE,
+  err
 }
 
 export function loginUser(user) {
@@ -101,6 +120,19 @@ export function logoutUser() {
     })
     .catch(err => {
       dispatch(logoutUserFailure(err))
+    })
+  }
+}
+
+export function getUsers() {
+  return (dispatch) => {
+    dispatch(getUsersRequest())
+    return request('get', {}, apiUrl)
+    .then(users => {
+      dispatch(getUsersSuccess(users))
+    })
+    .catch(err => {
+      dispatch(getUsersFailure(err))
     })
   }
 }

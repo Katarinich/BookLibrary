@@ -1,5 +1,6 @@
 ﻿using BookLibrary.Api.Managers;
 using BookLibrary.Api.Models;
+using System.Collections.Generic;
 
 namespace BookLibrary.Api.Services
 {
@@ -24,6 +25,11 @@ namespace BookLibrary.Api.Services
             }
 
             return user;
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _userManager.GetAllUsers();
         }
     }
 }

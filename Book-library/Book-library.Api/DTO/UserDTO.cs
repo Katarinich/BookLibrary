@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Book_library.Api.DTO
+﻿namespace BookLibrary.Api.DTO
 {
     public class UserDTO
     {
@@ -14,5 +9,6 @@ namespace Book_library.Api.DTO
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string[] Roles { get; set; }
+        public string UserName { get; set; }
     }
 }

@@ -5,6 +5,7 @@ export default function user(state = { isFetchin: false }, action) {
     case types.LOGIN_USER_REQUEST:
     case types.LOGOUT_USER_REQUEST:
     case types.REGISTER_USER_REQUEST:
+    case types.GET_USERS_REQUEST:
       return {
         isFetching: true
       }
@@ -18,16 +19,22 @@ export default function user(state = { isFetchin: false }, action) {
        currentUser: {},
        isFetching: false
      }
-    case types.RGISTER_USER_SUCCESS:
+    case types.REGISTER_USER_SUCCESS:
       return {
         isFetching: false
       }
+    case types.GET_USERS_SUCCESS:
+      return {
+        isFetching: false,
+        users: JSON.parse(action.users)
+      }
+    case types.GET_USERS_FAILURE:
     case types.LOGIN_USER_FAILURE:
     case types.LOGOUT_USER_FAILUR:
     case types.REGISTER_USER_FAILURE:
       return {
         isFetching: false,
-        error: action.error
+        error: action.err
       }
     default:
       return state;

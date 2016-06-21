@@ -6,7 +6,6 @@ import MainSection from './MainSection'
 
 export default class App extends Component {
   render() {
-    const { currentUser } = this.props.users
     return (
       <div className="container">
         { this.props.children }
@@ -14,9 +13,3 @@ export default class App extends Component {
     )
   }
 }
-
-function mapStateToProps(state) {
-  return state
-}
-
-export default connect(mapStateToProps)(App)

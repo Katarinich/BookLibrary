@@ -1,24 +1,27 @@
-import React, { Component } from 'react';
-import { Nav } from 'react-bootstrap';
-import { Link} from 'react-router';
-import { Navbar} from 'react-bootstrap';
-import { NavItem} from 'react-bootstrap';
+import React, { Component } from 'react'
+import { Nav, Navbar, NavItem } from 'react-bootstrap'
+import { Link } from 'react-router'
+import { LinkContainer } from 'react-router-bootstrap'
 
 export default class Header extends Component {
-
-  handleSelect(selectedKey) {
-    alert('selected ' + selectedKey);
-  }
-
   render() {
     return(
       <Navbar inverse>
+        <Navbar.Header>
+            <Navbar.Brand>
+              <Link to="/">BookLibrary</Link>
+            </Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
         <Navbar.Collapse >
           <Nav bsStyle="pills" pullRight>
-            <NavItem><Link to='/profile/1'>Ivan Ivanov</Link></NavItem>
-            <NavItem><Link to='/login'>Log out</Link></NavItem>
+            <LinkContainer to={{ pathname: '/profile/1' }}>
+              <NavItem>Ivan Ivanov</NavItem>
+            </LinkContainer>
+            <LinkContainer to={{ pathname: '/login' }}>
+              <NavItem>Log out</NavItem>
+            </LinkContainer>
           </Nav>
-          {this.props.children}
         </Navbar.Collapse>
       </Navbar>);
   }

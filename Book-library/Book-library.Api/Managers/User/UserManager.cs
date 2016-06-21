@@ -1,6 +1,7 @@
 ﻿using BookLibrary.Api.DAL;
 using BookLibrary.Api.Models;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 
@@ -9,10 +10,6 @@ namespace BookLibrary.Api.Managers
     public class UserManager : IUserManager
     {
         private BookLibraryContext _context;
-        //public UserManager()
-        //{
-        //    _context = new BookLibraryContext();
-        //}
 
         public UserManager(BookLibraryContext context)
         {
@@ -77,6 +74,11 @@ namespace BookLibrary.Api.Managers
             {
                 throw ex;
             }
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _context.Users.ToList();
         }
     }
 }

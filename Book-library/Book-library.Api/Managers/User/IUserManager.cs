@@ -1,4 +1,5 @@
 ﻿using BookLibrary.Api.Models;
+using System.Collections.Generic;
 
 namespace BookLibrary.Api.Managers
 {
@@ -11,5 +12,7 @@ namespace BookLibrary.Api.Managers
         void AddUser(User user);
 
         void UpdateUser();
+
+        List<User> GetAllUsers();
     }
 }
