@@ -2,7 +2,7 @@
 
 namespace BookLibrary.Api.Services
 {
-    interface IAuthentificationService
+    public interface IAuthentificationService
     {
         User Authentificate(CredentialsDraft credentialsDraft);
     }

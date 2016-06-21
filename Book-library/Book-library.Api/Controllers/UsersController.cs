@@ -1,9 +1,9 @@
-﻿using BookLibrary.Api.DAL;
-using BookLibrary.Api.Managers;
+﻿using Book_library.Api.DTO;
 using BookLibrary.Api.Models;
 using BookLibrary.Api.Services;
-using BookLibrary.Api.Services.NotificationTransport;
-using SimpleInjector;
+using System;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 
 namespace BookLibrary.Api.Controllers
@@ -17,19 +17,14 @@ namespace BookLibrary.Api.Controllers
         private IAuthentificationService _autentificationService;
         private IJwtService _jwtService;
 
-        public UsersController()
+        public UsersController(IUserService userService, IRegistrationService registrationalService, IConfirmationSenderService confirmationalService, 
+            IAuthentificationService authentificationSerice, IJwtService jwtService)
         {
-            var container = new Container();
-            container.Register<BookLibraryContext, BookLibraryContext>(Lifestyle.Singleton);
-            container.Register<IUserManager, UserManager>(Lifestyle.Singleton);
-            container.Register<IConfirmationCodeManager, ConfirmationCodeManager>(Lifestyle.Singleton);
-            container.Register<IEmailManager, EmailManager>(Lifestyle.Singleton);
-            container.Register<ICodeGenerator, CodeGenerator>();
-            container.Register<INotificationTransportService, NotificationTransportService>();
-
-            _userService = container.GetInstance<UserService>();
-            _registrationService = container.GetInstance<RegistrationService>();
-            _confirmationSenderService = container.GetInstance<ConfirmationSenderService>();
+            _userService = userService;
+            _jwtService = jwtService;
+            _autentificationService = authentificationSerice;
+            _registrationService = registrationalService;
+            _confirmationSenderService = confirmationalService;
         }
 
         [Route("signup")]
@@ -56,15 +51,22 @@ namespace BookLibrary.Api.Controllers
         }
 
         [Route("signin")]
-        public IHttpActionResult Login(CredentialsDraft credentialsDraft)
+        public HttpResponseMessage Login(CredentialsDraft credentialsDraft)
         {
             var user = _autentificationService.Authentificate(credentialsDraft);
 
-            if (user == null) return BadRequest("User not found.");
+            if (user == null) return Request.CreateResponse(HttpStatusCode.BadRequest);
 
             var token = _jwtService.CreateToken(user);
 
-            return Ok(new { user, token.Value });
+            var userDTO = new UserDTO();
+
+            userDTO.Id = user.UserId;
+            userDTO.TokenValue = token.Value;
+
+            var response = Request.CreateResponse(HttpStatusCode.OK, userDTO);
+
+            return response;
         }
     }
 }

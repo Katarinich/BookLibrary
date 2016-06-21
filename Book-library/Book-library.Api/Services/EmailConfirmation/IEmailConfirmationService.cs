@@ -1,6 +1,6 @@
 ﻿namespace BookLibrary.Api.Services
 {
-    interface IEmailConfirmationService
+    public interface IEmailConfirmationService
     {
         bool TryAcceptConfirmation(string codeValue);
     }

@@ -2,7 +2,7 @@
 
 namespace BookLibrary.Api.Services
 {
-    interface IJwtService
+    public interface IJwtService
     {
         Token CreateToken(User user);
     }

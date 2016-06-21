@@ -94,6 +94,14 @@
       <HintPath>..\packages\SimpleInjector.3.1.5\lib\net45\SimpleInjector.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SimpleInjector.Extensions.ExecutionContextScoping, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Extensions.ExecutionContextScoping.3.1.5\lib\net45\SimpleInjector.Extensions.ExecutionContextScoping.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SimpleInjector.Integration.WebApi, Version=3.1.5.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.Integration.WebApi.3.1.5\lib\net45\SimpleInjector.Integration.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -191,6 +199,7 @@
     <Compile Include="DAL\BookLibraryContext.cs" />
     <Compile Include="DAL\CredentialMap.cs" />
     <Compile Include="DAL\UserMap.cs" />
+    <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeExpirationDateIsUpException.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeIsNotActiveException.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeIsNotExistException.cs" />

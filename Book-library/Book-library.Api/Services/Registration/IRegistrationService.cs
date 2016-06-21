@@ -2,7 +2,7 @@
 
 namespace BookLibrary.Api.Services
 {
-    interface IRegistrationService
+    public interface IRegistrationService
     {
         void RegisterUser(User user);
     }

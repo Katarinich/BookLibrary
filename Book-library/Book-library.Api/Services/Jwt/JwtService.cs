@@ -8,13 +8,11 @@ namespace BookLibrary.Api.Services
 {
     public class JwtService : IJwtService
     {
-        private JwsAlgorithm _algortithm;
         private byte[] _secretKey = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
         private ITokenManager _tokenManager;
-        public JwtService(JwsAlgorithm algortithm, ITokenManager tokenManager)
+        public JwtService(ITokenManager tokenManager)
         {
             _tokenManager = tokenManager;
-            _algortithm = algortithm;
         }
 
         public Token CreateToken(User user)
@@ -30,7 +28,7 @@ namespace BookLibrary.Api.Services
             };
 
             var token = new Token();
-            token.Value = JWT.Encode(payload, _secretKey, _algortithm); ;
+            token.Value = JWT.Encode(payload, _secretKey, JwsAlgorithm.HS256); ;
             token.ExpirationDate = unixEpoch;
 
             _tokenManager.AddToken(token);

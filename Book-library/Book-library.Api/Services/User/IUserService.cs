@@ -2,7 +2,7 @@
 
 namespace BookLibrary.Api.Services
 {
-    interface IUserService
+    public interface IUserService
     {
         User GetUserByLogins(string[] logins);
     }

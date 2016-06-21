@@ -2,7 +2,7 @@
 
 namespace BookLibrary.Api.Services
 {
-    interface IConfirmationSenderService
+    public interface IConfirmationSenderService
     {
         void SendConfirmation(string emailValue, ConfirmationCodeType type);
     }
