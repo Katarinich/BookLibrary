@@ -1,36 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
-export default class RegistrationForm extends Component {
-  handleSubmit(e) {
-    e.preventDefault()
-
-    var formData = {
-      userName: $('[name=userName]').val(),
-      firstName: $('[name=firstName]').val(),
-      lastName: $('[name=lastName]').val(),
-      email: $('[name=email]').val(),
-      dateOfBirth: new Date($('[name=bday]').val()).getTime() / 1000,
-      mobilePhone: $('[name=phone]').val(),
-      country: $('[name=country]').val(),
-      state: $('[name=state]').val(),
-      city: $('[name=city]').val(),
-      addressLine: $('[name=address]').val(),
-      zipcode: $('[name=zipcode]').val(),
-      password: $('[name=password]').val()
-    }
-
-    fetch('http://localhost:51407/users/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
-  }
-
+export default class Profile extends Component {
   render() {
     return(
-      <form onSubmit={ e => this.handleSubmit(e) } >
+      <form >
         <div className="form-group">
           <label>Username: </label>
           <input type="text" className="form-control" name="userName" defaultValue="J.Doe" />
@@ -81,6 +54,6 @@ export default class RegistrationForm extends Component {
         </div>
         <button className="btn btn-primary" type="submit">Send</button>
       </form>
-    )
+    );
   }
 }

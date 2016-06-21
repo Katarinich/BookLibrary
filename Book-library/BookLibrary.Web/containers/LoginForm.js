@@ -1,42 +1,28 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
+﻿import React, { Component } from 'react';
 
 export default class LoginForm extends Component {
-  handleSubmit(e) {
-    e.preventDefault()
 
-    var formData = {
-      login: $('[name=userName]').val(),
-      password: $('[name=password]').val()
-    }
+handleSubmit(e){
 
-    fetch('http://localhost:51407/users/signin', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(json => console.log(json))
-  }
+  var form = document.querySelector('form')
 
-  render() {
-    return(
-      <form onSubmit={ e => this.handleSubmit(e) } >
-        <FormGroup>
-          <ControlLabel>Username: </ControlLabel>
-          <FormControl type="text" name="userName" defaultValue="J.Doe" />
-        </FormGroup>
-        <FormGroup>
-          <ControlLabel>Password: </ControlLabel>
-          <FormControl type="password" name="password" />
-        </FormGroup>
-        <Button type="submit">
-          Submit
-        </Button>
-      </form>
-    )
-  }
+  fetch('/', {
+    method: 'POST',
+    body: new FormData(form)
+  })
+}
+
+render(){
+    return (
+       <form onSubmit={e => this.handleSubmit(e)}>
+         <label>Name</label>
+         <p><input type="text" name="login" defaultValue="a@mail.ru" /></p>
+
+         <label>Password</label>
+         <p><input type="password" name="password" defaultValue="123456" /></p>
+
+         <input type="submit" name="submit" value="Sign In" />
+       </form>
+  );
+}
 }
