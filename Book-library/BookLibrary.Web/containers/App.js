@@ -1,13 +1,22 @@
-﻿import React, { Component } from 'react';
-import LoginForm from './LoginForm';
-import MainSection from './MainSection';
+﻿import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
-export default class Root extends Component {
-    render() {
-        return (
-      <div>
-      <LoginForm />
+import LoginSection from './LoginSection'
+import MainSection from './MainSection'
+
+export default class App extends Component {
+  render() {
+    const { currentUser } = this.props.users
+    return (
+      <div className="container">
+        { this.props.children }
       </div>
-    );
+    )
+  }
 }
+
+function mapStateToProps(state) {
+  return state
 }
+
+export default connect(mapStateToProps)(App)

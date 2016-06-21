@@ -3,15 +3,26 @@ import { Route, IndexRoute } from 'react-router'
 
 import App from './containers/App'
 import Profile from './containers/Profile'
-import Home from './containers/Home'
 import MainSection from './containers/MainSection'
+import LoginSection from './containers/LoginSection'
 
-export const routes = (
-  <div>
-  <Route path='/' component={MainSection}>
-  <IndexRoute component={Home} />
-    <Route path='profile/:UserId' component={Profile} />
-  </Route>
-  <Route path='login' component={App} />
-  </div>
-)
+export default (store) => {
+  const requireAuth = (nextState, replace, callback) => {
+    const { users: { currentUser } } = store.getState()
+    if (!currentUser) {
+      replace({
+        pathname: '/login',
+        state: { nextPathname: nextState.location.pathname }
+      })
+    }
+    callback()
+  }
+  return (
+    <Route component={ App }>
+      <Route path="/" component={ MainSection } onEnter={ requireAuth } >
+        <Route path="profile/:userId" component={ Profile } />
+      </Route>
+      <Route path="login" component={ LoginSection } />
+    </Route>
+  )
+}

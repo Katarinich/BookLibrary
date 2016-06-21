@@ -1,3 +1,5 @@
+import { browserHistory } from 'react-router'
+
 import request from './utils/request'
 import * as types from '../constants/actionTypes'
 
@@ -69,6 +71,7 @@ export function loginUser(user) {
     return request('post', {...user}, `${apiUrl}/signin`)
     .then(res => {
       dispatch(loginUserSuccess(res))
+      browserHistory.push('/')
     })
     .catch(err => {
       dispatch(loginUserFailure(err))

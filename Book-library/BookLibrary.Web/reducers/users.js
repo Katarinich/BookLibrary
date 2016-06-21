@@ -1,6 +1,6 @@
 import * as types from '../constants/actionTypes'
 
-export default function user(state = {}, action) {
+export default function user(state = { isFetchin: false }, action) {
   switch(action.type) {
     case types.LOGIN_USER_REQUEST:
     case types.LOGOUT_USER_REQUEST:

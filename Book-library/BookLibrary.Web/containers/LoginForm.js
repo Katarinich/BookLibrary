@@ -24,11 +24,11 @@ class LoginForm extends Component {
       <form onSubmit={ e => this.handleSubmit(e) } >
         <FormGroup>
           <ControlLabel>Username: </ControlLabel>
-          <FormControl type="text" name="userName" defaultValue="J.Doe" />
+          <FormControl type="text" name="userName" defaultValue="Jane.Doe" />
         </FormGroup>
         <FormGroup>
           <ControlLabel>Password: </ControlLabel>
-          <FormControl type="password" name="password" />
+          <FormControl type="password" name="password" defaultValue="12345678"/>
         </FormGroup>
         <Button type="submit">
           Submit
