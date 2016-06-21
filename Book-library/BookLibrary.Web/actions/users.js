@@ -1,4 +1,4 @@
-import request from './util/request'
+import request from './utils/request'
 import * as types from '../constants/actionTypes'
 
 const apiUrl = 'http://localhost:51407/users'
@@ -37,9 +37,17 @@ function registerUserSuccess() {
   }
 }
 
-function logoutUserRequest() {
+function registerUserFailure(err) {
   return {
-    type: types.LOGOUT_USER_REQUEST
+    type: types.REGISTER_USER_FAILURE,
+    err
+  }
+}
+
+function logoutUserRequest(user) {
+  return {
+    type: types.LOGOUT_USER_REQUEST,
+    user
   }
 }
 
@@ -75,7 +83,7 @@ export function registerUser(user) {
     .then(() => {
       dispatch(registerUserSuccess())
     })
-    .cathc(err => {
+    .catch(err => {
       dispatch(registerUserFailure(err))
     })
   }
@@ -83,8 +91,8 @@ export function registerUser(user) {
 
 export function logoutUser() {
   return (dispatch) => {
-    dispatch(logoutUserRequest())
-    return request('get', {}, `${apiUrl}/logout`)
+    dispatch(logoutUserRequest(user))
+    return request('post', {...user}, `${apiUrl}/logout`)
     .then(() => {
       dispatch(logoutUserSuccess())
     })
