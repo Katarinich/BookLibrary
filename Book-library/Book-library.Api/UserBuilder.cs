@@ -21,7 +21,8 @@ namespace BookLibrary.Api
             var address = new Address();
             address.Country = userToBuild.country;
             address.City = userToBuild.city;
-            address.ZipCode = userToBuild.zipCode;
+            address.Zipcode = userToBuild.zipcode;
+            address.AddressLine = userToBuild.addressLine;
             address.State = userToBuild.state;
             address.User = user;
             user.Address = address;
@@ -36,7 +37,7 @@ namespace BookLibrary.Api
             email.User = user;
             email.Value = userToBuild.email;
             email.IsConfirmed = false;
-            email.IsActive = false;
+            email.IsActive = true;
 
             user.Emails.Add(email);
 

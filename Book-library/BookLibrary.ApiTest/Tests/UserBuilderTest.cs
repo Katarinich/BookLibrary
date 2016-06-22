@@ -26,7 +26,7 @@ namespace BookLibrary.Api
             Assert.AreEqual(user.Address.Country, userDraft.country);
             Assert.AreEqual(user.Address.City, userDraft.city);
             Assert.AreEqual(user.Address.State, userDraft.state);
-            Assert.AreEqual(user.Address.ZipCode, userDraft.zipCode);
+            Assert.AreEqual(user.Address.Zipcode, userDraft.zipCode);
             Assert.AreSame(user.Address.User, user);
 
             Assert.IsNotNull(user.MobilePhone);

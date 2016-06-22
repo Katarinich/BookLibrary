@@ -9,5 +9,6 @@ namespace BookLibrary.Api.Models
         public int TokenId { get; set; } 
         public DateTime ExpirationDate { get; set; }
         public string Value { get; set; }
+        public bool isActive { get; set; }
     }
 }

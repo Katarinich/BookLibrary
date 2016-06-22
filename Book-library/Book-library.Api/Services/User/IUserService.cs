@@ -8,5 +8,7 @@ namespace BookLibrary.Api.Services
         User GetUserByLogins(string[] logins);
 
         List<User> GetAllUsers();
+
+        User UpdateUser(User updatedUser);
     }
 }

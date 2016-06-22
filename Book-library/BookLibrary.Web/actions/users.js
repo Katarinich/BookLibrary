@@ -80,8 +80,31 @@ function getUsersSuccess(users) {
 }
 
 function getUsersFailure(err) {
-  type: types.GET_USERS_FAILURE,
-  err
+  return {
+    type: types.GET_USERS_FAILURE,
+    err
+  }
+}
+
+function updateUserRequest(user) {
+  return {
+    type: types.UPDATE_USER_REQUEST,
+    user
+  }
+}
+
+function updateUserSuccess(user) {
+  return {
+    type: types.UPDATE_USER_SUCCESS,
+    user
+  }
+}
+
+function updateUserFailure(err) {
+  return {
+    type: types.UPDATE_USER_FAILURE,
+    err
+  }
 }
 
 export function loginUser(user) {
@@ -111,7 +134,7 @@ export function registerUser(user) {
   }
 }
 
-export function logoutUser() {
+export function logoutUser(user) {
   return (dispatch) => {
     dispatch(logoutUserRequest(user))
     return request('post', {...user}, `${apiUrl}/logout`)
@@ -133,6 +156,19 @@ export function getUsers() {
     })
     .catch(err => {
       dispatch(getUsersFailure(err))
+    })
+  }
+}
+
+export function updateUser(user) {
+  return (dispatch) => {
+    dispatch(updateUserRequest)
+    return request('post', {...user}, `${apiUrl}/update`)
+    .then(user => {
+      dispatch(updateUserSuccess(user))
+    })
+    .catch(err => {
+      dispatch(updateUserFailure(err))
     })
   }
 }

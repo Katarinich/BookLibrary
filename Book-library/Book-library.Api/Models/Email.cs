@@ -14,32 +14,34 @@ namespace BookLibrary.Api.Models
         [Index(IsUnique = true)]
         public string Value { get; set; }
         public bool IsConfirmed { get; set; }
-        public bool IsActive
-        {
-            get
-            {
-                return _isActive;
-            }
-            set
-            {
-                if (value)
-                {
-                    if (IsConfirmed)
-                    {
-                        _isActive = true;
-                    }
-                    else
-                    {
-                        //throw new UnconfirmedEmailCannotBeActiveException();
-                        throw new System.Exception();
-                    }
-                }
-                else
-                {
-                    _isActive = value;
-                }
-                
-            }
-        }
+        //public bool IsActive
+        //{
+        //    get
+        //    {
+        //        return _isActive;
+        //    }
+        //    set
+        //    {
+        //        if (value)
+        //        {
+        //            if (IsConfirmed)
+        //            {
+        //                _isActive = true;
+        //            }
+        //            else
+        //            {
+        //                //throw new UnconfirmedEmailCannotBeActiveException();
+        //                throw new System.Exception();
+        //            }
+        //        }
+        //        else
+        //        {
+        //            _isActive = value;
+        //        }
+
+        //    }
+        //}
+
+        public bool IsActive { get; set; }
     }
 }

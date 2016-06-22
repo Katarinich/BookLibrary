@@ -92,7 +92,4 @@ RegistrationForm.propTypes = {
   registerUser: PropTypes.func.isRequired
 }
 
-export default connect(
-  () => ({}),
-  { registerUser }
-)(RegistrationForm)
+export default connect(() => ({}), { registerUser })(RegistrationForm)

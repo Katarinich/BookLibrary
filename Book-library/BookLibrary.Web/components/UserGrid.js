@@ -1,17 +1,14 @@
 import React, { Component } from 'react'
-
 import { Table } from 'react-bootstrap'
+
+import UserGridItem from './UserGridItem'
 
 export default class UserGrid extends Component {
   render() {
     const users = this.props.users.map(function(user) {
-      return <tr>
-               <td>{ user.id }</td>
-               <td>{ user.userName }</td>
-               <td>{ user.firstName }</td>
-               <td>{ user.lastName }</td>
-            </tr>
+      return <UserGridItem user={ user } key={ user.id } />
     })
+
     return(
       <Table striped bordered condensed hover>
         <thead>

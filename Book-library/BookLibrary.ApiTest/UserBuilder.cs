@@ -21,7 +21,7 @@ namespace BookLibrary.Api
             var address = new Address();
             address.Country = userToBuild.country;
             address.City = userToBuild.city;
-            address.ZipCode = userToBuild.zipCode;
+            address.Zipcode = userToBuild.zipCode;
             address.State = userToBuild.state;
             address.User = user;
             user.Address = address;

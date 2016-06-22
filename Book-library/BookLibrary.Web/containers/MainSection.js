@@ -3,7 +3,7 @@ import { Link } from 'react-router'
 import { connect } from 'react-redux'
 
 import Header from './Header'
-import UserGrid from './UserGrid'
+import UserGrid from '../components/UserGrid'
 import { getUsers } from '../actions'
 
 class MainSection extends Component {
@@ -13,10 +13,10 @@ class MainSection extends Component {
 
   render() {
     const { children } = this.props
-    const { users } = this.props.users
+    const { users, currentUser } = this.props.users
     return(
       <div>
-        <Header />
+        <Header user={ currentUser } />
         { children ? children : users ? <UserGrid users={ users } /> : ""}
       </div>
     )

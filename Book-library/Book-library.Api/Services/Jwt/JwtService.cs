@@ -30,6 +30,7 @@ namespace BookLibrary.Api.Services
             var token = new Token();
             token.Value = JWT.Encode(payload, _secretKey, JwsAlgorithm.HS256); ;
             token.ExpirationDate = unixEpoch;
+            token.isActive = true;
 
             _tokenManager.AddToken(token);
 
@@ -45,6 +46,13 @@ namespace BookLibrary.Api.Services
                 return false;
             }
             return true;
+        }
+
+        public void DeactivateToken(string tokenValue)
+        {
+            var token = _tokenManager.GetTokenByValue(tokenValue);
+            token.isActive = false;
+            _tokenManager.UpdateToken();
         }
     }
 }

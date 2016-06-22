@@ -1,9 +1,6 @@
 ﻿using BookLibrary.Api.DAL;
 using BookLibrary.Api.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace BookLibrary.Api.Managers
 {
@@ -25,6 +22,11 @@ namespace BookLibrary.Api.Managers
         public Token GetTokenByValue(string tokenValue)
         {
             return _context.Tokens.ToList().FirstOrDefault(t => t.Value == tokenValue);
+        }
+
+        public void UpdateToken()
+        {
+            _context.SaveChanges();
         }
     }
 }

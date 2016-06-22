@@ -10,5 +10,11 @@
         public string LastName { get; set; }
         public string[] Roles { get; set; }
         public string UserName { get; set; }
+        public int DateOfBirth { get; set; }
+        public string Country { get; set; }
+        public string State { get; set; }
+        public string City { get; set; }
+        public string AddressLine { get; set; }
+        public string Zipcode { get; set; }
     }
 }

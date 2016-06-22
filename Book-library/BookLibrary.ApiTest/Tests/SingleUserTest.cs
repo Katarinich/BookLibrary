@@ -105,7 +105,7 @@ namespace BookLibrary.Api.Tests
             Assert.AreEqual(user.Address.Country, addedUser.Address.Country);
             Assert.AreEqual(user.Address.City, addedUser.Address.City);
             Assert.AreEqual(user.Address.State, addedUser.Address.State);
-            Assert.AreEqual(user.Address.ZipCode, addedUser.Address.ZipCode);
+            Assert.AreEqual(user.Address.Zipcode, addedUser.Address.Zipcode);
             Assert.AreSame(addedUser.Address.User, addedUser);
 
             Assert.IsNotNull(addedUser.MobilePhone);

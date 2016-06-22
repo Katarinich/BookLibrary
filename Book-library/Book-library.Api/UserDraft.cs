@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BookLibrary.Api
+﻿namespace BookLibrary.Api
 {
     public class UserDraft
     {
@@ -15,6 +13,6 @@ namespace BookLibrary.Api
         public string state { get; set; }
         public string city { get; set; }
         public string addressLine { get; set; }
-        public string zipCode { get; set; } 
+        public string zipcode { get; set; } 
     }
 }

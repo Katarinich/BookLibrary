@@ -11,7 +11,8 @@ namespace BookLibrary.Api.Models
         public User User { get; set; }
         public string State { get; set; }
         public string City { get; set; }
-        //public List<string> AddressLines { get; set; }  
-        public string ZipCode { get; set; }    
+        //public List<string> AddressLines { get; set; } 
+        public string AddressLine { get; set; } 
+        public string Zipcode { get; set; }    
     }
 }

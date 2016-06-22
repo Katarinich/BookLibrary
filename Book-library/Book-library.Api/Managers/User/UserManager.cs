@@ -78,7 +78,14 @@ namespace BookLibrary.Api.Managers
 
         public List<User> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return _context.Users
+                .Include("Credentials")
+                .Include("Emails")
+                .Include("Address")
+                .Include("UserRoles")
+                .Include("MobilePhone")
+                .Include("Credentials.Logins")
+                .Include("Credentials.Passwords").ToList();
         }
     }
 }
