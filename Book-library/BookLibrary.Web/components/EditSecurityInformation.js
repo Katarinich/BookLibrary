@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
 
 export default class EditSecurityInformation extends Component {

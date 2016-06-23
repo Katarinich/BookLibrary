@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, IndexRoute } from 'react-router'
+import { Route, IndexRoute, browserHistory } from 'react-router'
 
 import App from './containers/App'
 import Profile from './containers/Profile'
@@ -17,6 +17,7 @@ export default (store) => {
     }
     callback()
   }
+
   return (
     <Route component={ App }>
       <Route path="/" component={ MainSection } onEnter={ requireAuth } >

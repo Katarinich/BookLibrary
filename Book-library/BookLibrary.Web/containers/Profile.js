@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import ProfileViewer from '../components/ProfileViewer'
 import ProfileEditor from '../components/ProfileEditor'
+import { updateUser } from '../actions'
 
 class Profile extends Component {
   render() {
@@ -12,7 +13,7 @@ class Profile extends Component {
 
     return(
       <div>
-        { currentUser.id == userId ? <ProfileEditor user={ currentUser } /> : <ProfileViewer user={ profileUser } />}
+        { currentUser.id == userId ? <ProfileEditor updateGeneralUserInfo={ this.props.updateUser } user={ currentUser } /> : <ProfileViewer user={ profileUser } />}
       </div>
     )
   }
@@ -22,4 +23,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps)(Profile)
+export default connect(mapStateToProps, { updateUser })(Profile)

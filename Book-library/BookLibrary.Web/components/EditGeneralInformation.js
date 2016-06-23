@@ -2,13 +2,13 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
 
-import { updateUser } from '../actions'
+import UserEmailChanger from './UserEmailChanger'
 
-class EditGeneralInformation extends Component {
+export default class EditGeneralInformation extends Component {
   handleSubmit(e) {
     e.preventDefault()
 
-    const { updateUser, user } = this.props
+    const { onSubmit, user } = this.props
 
     var formData = {
       email: user.email,
@@ -25,11 +25,11 @@ class EditGeneralInformation extends Component {
       password: "12345678"
     }
 
-    updateUser(formData)
+    onSubmit(formData)
   }
 
   render() {
-    const { user } = this.props
+    const { user, hideResponseMessage } = this.props
     const options = {
       year: 'numeric',
       month: 'long',
@@ -62,12 +62,7 @@ class EditGeneralInformation extends Component {
             </div>
           </FormGroup>
 
-          <FormGroup>
-            <ControlLabel bsClass="control-label col-sm-3">Email</ControlLabel>
-            <div className="col-sm-9">
-              <FormControl type="email" name="email" defaultValue={ user.email } />
-            </div>
-          </FormGroup>
+          <UserEmailChanger email={ user.email } onClick={ hideResponseMessage }/>
 
           <FormGroup>
             <ControlLabel bsClass="control-label col-sm-3">Date of Birth</ControlLabel>
@@ -129,9 +124,3 @@ class EditGeneralInformation extends Component {
     )
   }
 }
-
-EditGeneralInformation.propTypes = {
-  updateUser: PropTypes.func.isRequired
-}
-
-export default connect(() => ({}), { updateUser })(EditGeneralInformation)

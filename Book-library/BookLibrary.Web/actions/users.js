@@ -2,6 +2,7 @@ import { browserHistory } from 'react-router'
 
 import request from './utils/request'
 import * as types from '../constants/actionTypes'
+import { showResponseMessage } from './response'
 
 const apiUrl = 'http://localhost:51407/users'
 
@@ -107,13 +108,16 @@ function updateUserFailure(err) {
   }
 }
 
-export function loginUser(user) {
+export function loginUser(user, location) {
   return (dispatch) => {
     dispatch(loginUserRequest(user))
     return request('post', {...user}, `${apiUrl}/signin`)
     .then(res => {
       dispatch(loginUserSuccess(res))
-      browserHistory.push('/')
+
+      if(location.state && location.state.nextPathname)
+        browserHistory.push(location.state.nextPathname)
+      else browserHistory.push('/')
     })
     .catch(err => {
       dispatch(loginUserFailure(err))
@@ -125,11 +129,14 @@ export function registerUser(user) {
   return (dispatch) => {
     dispatch(registerUserRequest(user))
     return request('post', {...user}, `${apiUrl}/signup`)
-    .then(() => {
+    .then(res => {
       dispatch(registerUserSuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
     })
     .catch(err => {
       dispatch(registerUserFailure(err))
+      dispatch(showResponseMessage(err.message, 'danger'))
     })
   }
 }
@@ -162,13 +169,25 @@ export function getUsers() {
 
 export function updateUser(user) {
   return (dispatch) => {
-    dispatch(updateUserRequest)
+    dispatch(updateUserRequest(user))
     return request('post', {...user}, `${apiUrl}/update`)
     .then(user => {
       dispatch(updateUserSuccess(user))
     })
     .catch(err => {
       dispatch(updateUserFailure(err))
+    })
+  }
+}
+
+export function initiateUserEmailChange(user) {
+  return (dispatch) => {
+    dispatch(initiateUserEmailChangeRequest(user))
+    return request('post', {...user}, `${apiUrl}/email/change`)
+    .then(res => {
+      dispatch(initiateUserEmailChangeSuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
     })
   }
 }

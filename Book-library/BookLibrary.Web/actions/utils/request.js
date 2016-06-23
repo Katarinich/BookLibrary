@@ -21,8 +21,10 @@ function checkStatus(res) {
   if (res.status >= 200 && res.status < 400)
     return res
   else {
-    const err = new Error(res)
-    err.status = res.statusText
-    throw err
+    var json = res.json()
+    return json.then(err => {
+      err.status = res.statusText
+      throw err
+    })
   }
 }
