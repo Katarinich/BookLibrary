@@ -1,6 +1,6 @@
 ﻿namespace BookLibrary.Api
 {
-    interface IPasswordChangeService
+    public interface IPasswordChangeService
     {
         void ChangePassword(int userId, string oldPasswordValue, string newPasswordValue);
     }

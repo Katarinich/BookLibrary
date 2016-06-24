@@ -20,13 +20,12 @@
             
             var user = _confirmationCodeService.GetRelatedUser(codeValue);
 
-            if (_passwordPolicy.SatisfiesPolicy(user, newPasswordValue))
-            {
-                newPasswordValue = _passwordHasher.GetHash(newPasswordValue);
-                user.UpdatePassword(newPasswordValue);
-                _confirmationCodeService.DeactivateCode(codeValue);
-                
-            }
+            if (!_passwordPolicy.SatisfiesPolicy(user, newPasswordValue))
+                throw new PasswordDoesNotSatisfyPolicyException("Password does not satisfy policy.");
+
+            newPasswordValue = _passwordHasher.GetHash(newPasswordValue);
+            user.UpdatePassword(newPasswordValue);
+            _confirmationCodeService.DeactivateCode(codeValue);
         }
     }
 }

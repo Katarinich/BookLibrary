@@ -1,6 +1,6 @@
 ﻿namespace BookLibrary.Api.Services
 {
-    interface IPasswordRecoveryService
+    public interface IPasswordRecoveryService
     {
         void RecoverPassword(string newPasswordValue, string codeValue);
     }

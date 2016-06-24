@@ -10,6 +10,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using BookLibrary.Api.Exceptions;
 using BookLibrary.Api.Exceptions.CodeExceptions;
+using BookLibrary.Api.Exceptions.PasswordExceptions;
 
 namespace BookLibrary.Api.Controllers
 {
@@ -23,9 +24,12 @@ namespace BookLibrary.Api.Controllers
         private IJwtService _jwtService;
         private IEmailChangeService _emailChangeService;
         private IEmailConfirmationService _emailConfirmationService;
+        private IPasswordChangeService _passwordChangeService;
+        private IPasswordRecoveryService _passwordRecoveryService;
 
-        public UsersController(IUserService userService, IRegistrationService registrationalService, IConfirmationSenderService confirmationalService, 
-            IAuthentificationService authentificationSerice, IJwtService jwtService, IEmailChangeService emailChangeService, IEmailConfirmationService emailConfirmationService)
+        public UsersController(IUserService userService, IRegistrationService registrationalService, IConfirmationSenderService confirmationalService,
+            IAuthentificationService authentificationSerice, IJwtService jwtService, IEmailChangeService emailChangeService, IEmailConfirmationService emailConfirmationService,
+            IPasswordChangeService passwordChangeService, IPasswordRecoveryService passwordRecoveryService)
         {
             _emailChangeService = emailChangeService;
             _userService = userService;
@@ -34,11 +38,18 @@ namespace BookLibrary.Api.Controllers
             _registrationService = registrationalService;
             _confirmationSenderService = confirmationalService;
             _emailConfirmationService = emailConfirmationService;
+            _passwordChangeService = passwordChangeService;
+            _passwordRecoveryService = passwordRecoveryService;
         }
 
         [Route("")]
-        public IEnumerable<UserDTO> GetAllUsers()
+        [HttpGet]
+        public HttpResponseMessage GetAllUsers(HttpRequestMessage request)
         {
+            if (request.Headers.Authorization == null || !_jwtService.ValidateToken("ololo"))
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
+
+
             var users = _userService.GetAllUsers();
             List<UserDTO> usersDTO = new List<UserDTO>();
 
@@ -61,7 +72,7 @@ namespace BookLibrary.Api.Controllers
                 });
             }
 
-            return usersDTO;
+            return Request.CreateResponse(HttpStatusCode.OK, usersDTO);
         }
 
         [Route("signup")]
@@ -211,6 +222,69 @@ namespace BookLibrary.Api.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, newEmailValue);
+        }
+
+        [Route("password/change")]
+        [HttpPost]
+        public HttpResponseMessage ChangePassword(JObject passwords)
+        {
+            var userId = (int)passwords["userId"];
+            var oldPasswordValue = passwords["oldPasswordValue"].ToString();
+            var newPasswordValue = passwords["newPasswordValue"].ToString();
+
+            try
+            {
+                _passwordChangeService.ChangePassword(userId, oldPasswordValue, newPasswordValue);
+            }
+            catch(OldPasswordWrongException ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+            catch(PasswordDoesNotSatisfyPolicyException ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, "Password was changed.");
+        }
+
+        [Route("password/recover/initiate")]
+        [HttpPost]
+        public HttpResponseMessage InitiatePasswordRecovery(JObject email)
+        {
+            var emailValue = email["emailValue"].ToString();
+
+            try
+            {
+                _confirmationSenderService.SendConfirmation(emailValue, ConfirmationCodeType.PasswordRecovery);
+            }
+            catch(EmailNotFoundException)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Email not found.");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, "Email with confirmation was sended on your email address.");
+        }
+
+        [Route("password/recover/finish")]
+        [HttpPost]
+        public HttpResponseMessage FinishPasswordRecovery(JObject passwordRecoveryDraft)
+        {
+            var newPasswordValue = passwordRecoveryDraft["newPasswordValue"].ToString();
+            var codeValue = passwordRecoveryDraft["codeValue"].ToString();
+            try
+            {
+                _passwordRecoveryService.RecoverPassword(newPasswordValue, codeValue);
+            }
+            catch (PasswordDoesNotSatisfyPolicyException e)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, e.Message);
+            }
+            catch (Exception ex)
+                when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeExpirationDateIsUpException)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, "Password was changed.");
         }
     }
 }

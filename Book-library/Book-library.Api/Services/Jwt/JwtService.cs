@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Jose;
 using BookLibrary.Api.Models;
 using BookLibrary.Api.Managers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BookLibrary.Api.Services
 {
@@ -39,9 +41,22 @@ namespace BookLibrary.Api.Services
 
         public bool ValidateToken(string tokenValue)
         {
-            var token = _tokenManager.GetTokenByValue(tokenValue);
-            if (token == null) return false;
-            if (DateTime.Compare(DateTime.UtcNow, token.ExpirationDate) > 0)
+            string json;
+
+            try
+            {
+                json = JWT.Decode(tokenValue, _secretKey);
+            }
+            catch(Exception)
+            {
+                return false;
+            }
+
+            var tokenObject = JsonConvert.DeserializeObject<JObject>(json);
+            var experationTimeStamp = (int)tokenObject["exp"];
+            var experationDate = new DateTime(experationTimeStamp);
+
+            if (DateTime.Compare(DateTime.UtcNow, experationDate) > 0)
             {
                 return false;
             }

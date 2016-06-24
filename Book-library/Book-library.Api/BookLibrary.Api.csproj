@@ -208,7 +208,6 @@
     <Compile Include="Exceptions\EmailIsAlredyTakenException.cs" />
     <Compile Include="Exceptions\EmailNotFoundException.cs" />
     <Compile Include="Exceptions\LoginsAreNotUniqException.cs" />
-    <Compile Include="Exceptions\PasswordExceptions\NewPasswordDoesNotApplyPolicyException.cs" />
     <Compile Include="Exceptions\PasswordExceptions\WrongOldPasswordException.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Global.asax.cs">
@@ -263,6 +262,7 @@
     <Compile Include="Services\PasswordChange\IPasswordChangeService.cs" />
     <Compile Include="Services\PasswordChange\PasswordChangeService.cs" />
     <Compile Include="Services\PasswordRecovery\IPasswordRecoveryService.cs" />
+    <Compile Include="Exceptions\PasswordExceptions\PasswordDoesNotSatisfyPolicyException.cs" />
     <Compile Include="Services\PasswordRecovery\PasswordRecoveryService.cs" />
     <Compile Include="Services\Registration\IRegistrationService.cs" />
     <Compile Include="Services\Registration\RegistrationService.cs" />

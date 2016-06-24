@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import RegistrationForm from '../components/RegistrationForm'
 import LoginForm from '../components/LoginForm'
-import { loginUser, registerUser, hideResponseMessage } from '../actions'
+import { loginUser, registerUser, initiatePasswordRecovery, hideResponseMessage } from '../actions'
 
 class LoginSection extends Component {
   constructor(props) {
@@ -22,7 +22,7 @@ class LoginSection extends Component {
 
   render() {
     const { login } = this.state
-    const { location } = this.props
+    const { location, hideResponseMessage, loginUser, registerUser, initiatePasswordRecovery } = this.props
     const { type, message } = this.props.response
     const activeTab = login ? 1 : 2
 
@@ -35,8 +35,8 @@ class LoginSection extends Component {
           </Nav>
         </div>
         <div style={{paddingTop: '10px'}}>
-          { login ? <LoginForm onSubmit={ this.props.loginUser } location={ location }/>
-                  : <RegistrationForm type={ type } message={ message } onUnmount={ this.props.hideResponseMessage } onSubmit={ this.props.registerUser }/> }
+          { login ? <LoginForm type={ type } message={ message } onSubmitRecovery={ initiatePasswordRecovery } onSubmit={ loginUser } location={ location }/>
+                  : <RegistrationForm type={ type } message={ message } onUnmount={ hideResponseMessage } onSubmit={ registerUser }/> }
         </div>
       </div>
     )
@@ -47,4 +47,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps, { registerUser, loginUser, hideResponseMessage })(LoginSection)
+export default connect(mapStateToProps, { registerUser, loginUser, hideResponseMessage, initiatePasswordRecovery })(LoginSection)

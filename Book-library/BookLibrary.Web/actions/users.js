@@ -185,6 +185,63 @@ function finishEmailChangeFailure(err) {
   }
 }
 
+function initiatePasswordRecoveryRequest() {
+  return {
+    type: types.INITIATE_PASSWORD_RECOVERY_REQUEST
+  }
+}
+
+function initiatePasswordRecoverySuccess() {
+  return {
+    type: types.INITIATE_PASSWORD_RECOVERY_SUCCESS
+  }
+}
+
+function initiatePasswordRecoveryFailure(err) {
+  return {
+    type: types.INITIATE_PASSWORD_RECOVERY_FAILURE,
+    err
+  }
+}
+
+function finishPasswordRecoveryRequest() {
+  return {
+    type: types.FINISH_PASSWORD_RECOVERY_REQUEST
+  }
+}
+
+function finishPasswordRecoverySuccess() {
+  return {
+    type: types.FINISH_PASSWORD_RECOVERY_SUCCESS
+  }
+}
+
+function finishPasswordRecoveryFailure(err) {
+  return {
+    type: types.FINISH_PASSWORD_RECOVERY_FAILURE,
+    err
+  }
+}
+
+function passwordChangeRequest(){
+  return {
+    type: types.PASSWORD_CHANGE_REQUEST
+  }
+}
+
+function passwordChangeSuccess(){
+  return {
+    type: types.PASSWORD_CHANGE_SUCCESS
+  }
+}
+
+function passwordChangeFailure(err){
+  return {
+    type: types.PASSWORD_CHANGE_FAILURE,
+    err
+  }
+}
+
 export function loginUser(user, location) {
   return (dispatch) => {
     dispatch(loginUserRequest(user))
@@ -232,14 +289,19 @@ export function logoutUser(user) {
 }
 
 export function getUsers() {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch(getUsersRequest())
-    return request('get', {}, apiUrl)
+    let { tokenValue } = getState().users.currentUser
+
+    return request('get', {}, apiUrl, tokenValue)
     .then(users => {
       dispatch(getUsersSuccess(users))
     })
     .catch(err => {
       dispatch(getUsersFailure(err))
+
+      if(err == 403)
+        browserHistory.push('/login')
     })
   }
 }
@@ -275,7 +337,7 @@ export function confirmEmail(codeValue) {
 
 export function initiateUserEmailChange(newEmailValue) {
   return (dispatch, getState) => {
-    const { currentUser } = getState().users
+    const { user } = getState().users
     dispatch(initiateUserEmailChangeRequest())
     return request('post', {...{newEmailValue: newEmailValue, userId: currentUser.id}}, `${apiUrl}/email/change/initiate`)
     .then(res => {
@@ -323,6 +385,60 @@ export function finishEmailChange(codeValue) {
       dispatch(finishEmailChangeFailure(err))
 
       dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function initiatePasswordRecovery(emailValue) {
+  return (dispatch) => {
+    dispatch(initiatePasswordRecoveryRequest())
+    return request('post', {...{emailValue: emailValue}}, `${apiUrl}/password/recover/initiate`)
+    .then(res => {
+      dispatch(initiatePasswordRecoverySuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(initiatePasswordRecoveryFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function finishPasswordRecovery(codeValue, newPasswordValue) {
+  return (dispatch) => {
+    dispatch(finishPasswordRecoveryRequest())
+
+    return request('post', {...{codeValue: codeValue, newPasswordValue: newPasswordValue}}, `${apiUrl}/password/recover/finish`)
+    .then(res => {
+      dispatch(finishPasswordRecoverySuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(finishPasswordRecoveryFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function passwordChange(oldPasswordValue, newPasswordValue) {
+  return (dispatch, getState) => {
+    const user = getState().users.currentUser
+    dispatch(passwordChangeRequest())
+
+    return request('post', {...{userId: user.id, oldPasswordValue: oldPasswordValue, newPasswordValue: newPasswordValue}}, `${apiUrl}/password/change`)
+    .then(res => {
+      dispatch(passwordChangeSuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(passwordChangeFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger') )
     })
   }
 }

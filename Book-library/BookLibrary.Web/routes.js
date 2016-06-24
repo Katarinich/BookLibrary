@@ -5,8 +5,9 @@ import App from './containers/App'
 import Profile from './containers/Profile'
 import MainSection from './containers/MainSection'
 import LoginSection from './containers/LoginSection'
-import EmailConfirmMessage from './containers/EmailConfirmMessage'
 import EmailChangeMessage from './containers/EmailChangeMessage'
+import EmailConfirmMessage from './containers/EmailConfirmMessage'
+import PasswordRecoveryForm from './containers/PasswordRecoveryForm'
 import EmailChangeConfirmMessage from './containers/EmailChangeConfirmMessage'
 
 export default (store) => {
@@ -30,6 +31,7 @@ export default (store) => {
       </Route>
       <Route path="login" component={ LoginSection } />
       <Route path="email-confirm/:codeValue" component={ EmailConfirmMessage } />
+      <Route path="password-recover/:codeValue" component={ PasswordRecoveryForm } />
     </Route>
   )
 }

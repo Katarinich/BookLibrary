@@ -25,11 +25,11 @@ namespace BookLibrary.Api.Services
 
             var oldPassword = user.Credentials.Passwords.First(p => p.IsActive);
 
-            if (oldPassword.Value != oldPasswordValue)
+            if (oldPassword.Value != _passwordHasher.GetHash(oldPasswordValue))
                 throw new OldPasswordWrongException("Old password is wrong");
 
             if (_passwordPolicy.SatisfiesPolicy(user, newPasswordValue))
-                throw new NewPasswordDoesNotApplyPolicyException("New password does not apply password policy.");
+                throw new PasswordDoesNotSatisfyPolicyException("New password does not apply password policy.");
 
 
             var newPassword = new Password();

@@ -2,11 +2,20 @@ import React, { Component } from 'react'
 import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
 
 export default class EditSecurityInformation extends Component {
+  handleSubmit(e) {
+    e.preventDefault()
+
+    var oldPasswordValue = $('[name=password]').val()
+    var newPasswordValue = $('[name=newPassword]').val()
+
+    this.props.onSubmit(oldPasswordValue, newPasswordValue)
+  }
+
   render() {
     const { user } = this.props
 
     return(
-      <form>
+      <form onSubmit={ this.handleSubmit.bind(this) }>
         <fieldset>
           <legend>Security Information</legend>
 

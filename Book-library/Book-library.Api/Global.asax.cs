@@ -34,6 +34,9 @@ namespace BookLibrary.Api
             container.Register<IEmailConfirmationService, EmailConfirmationService>(Lifestyle.Scoped);
             container.Register<IConfirmationCodeService, ConfirmationCodeService>(Lifestyle.Scoped);
             container.Register<ICodeValidationRule, CodeValidationRule>(Lifestyle.Scoped);
+            container.Register<IPasswordChangeService, PasswordChangeService>(Lifestyle.Scoped);
+            container.Register<IPasswordRecoveryService, PasswordRecoveryService>(Lifestyle.Scoped);
+            container.Register<IPasswordPolicy, PasswordPolicy>(Lifestyle.Scoped);
 
             container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
 

@@ -11,6 +11,9 @@ export default function user(state = { isFetching: false }, action) {
     case types.INITIATE_USER_EMAIL_CHANGE_REQUEST:
     case types.CONTINUE_EMAIL_CHANGE_REQUEST:
     case types.FINISH_EMAIL_CHANGE_REQUEST:
+    case types.INITIATE_PASSWORD_RECOVERY_REQUEST:
+    case types.FINISH_PASSWORD_RECOVERY_REQUEST:
+    case types.PASSWORD_CHANGE_REQUEST:
       return {
         ...state,
         isFetching: true
@@ -31,6 +34,9 @@ export default function user(state = { isFetching: false }, action) {
     case types.CONFIRM_EMAIL_SUCCESS:
     case types.INITIATE_USER_EMAIL_CHANGE_SUCCESS:
     case types.CONTINUE_EMAIL_CHANGE_SUCCESS:
+    case types.INITIATE_PASSWORD_RECOVERY_SUCCESS:
+    case types.FINISH_PASSWORD_RECOVERY_SUCCESS:
+    case types.PASSWORD_CHANGE_SUCCESS:
       return {
         ...state,
         isFetching: false
@@ -50,6 +56,9 @@ export default function user(state = { isFetching: false }, action) {
     case types.INITIATE_USER_EMAIL_CHANGE_FAILURE:
     case types.CONTINUE_EMAIL_CHANGE_FAILURE:
     case types.FINISH_EMAIL_CHANGE_FAILURE:
+    case types.INITIATE_PASSWORD_RECOVERY_FAILURE:
+    case types.FINISH_PASSWORD_RECOVERY_FAILURE:
+    case types.PASSWORD_CHANGE_FAILURE:
       return {
         ...state,
         isFetching: false,

@@ -6,7 +6,7 @@ import HttpResponseMessage from './HttpResponseMessage'
 
 export default class ProfileEditor extends Component {
   render() {
-    const { user, updateGeneralUserInfo, initiateUserEmailChange, type, message } = this.props
+    const { user, updateGeneralUserInfo, initiateUserEmailChange, type, message, passwordChange } = this.props
 
     return(
       <div className="row">
@@ -16,7 +16,7 @@ export default class ProfileEditor extends Component {
           <EditGeneralInformation onSubmit={ updateGeneralUserInfo } user={ user } initiateUserEmailChange={ initiateUserEmailChange }/>
         </div>
         <div className="form-horizontal col-sm-6">
-          <EditSecurityInformation user={ user } />
+          <EditSecurityInformation user={ user } onSubmit={ passwordChange }/>
         </div>
       </div>
     )
