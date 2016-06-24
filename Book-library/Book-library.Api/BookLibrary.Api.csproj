@@ -201,10 +201,13 @@
     <Compile Include="DAL\UserMap.cs" />
     <Compile Include="DTO\UserDTO.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeExpirationDateIsUpException.cs" />
+    <Compile Include="Exceptions\CodeExceptions\CodeHasWrongTypeExceptioncs.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeIsNotActiveException.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeIsNotExistException.cs" />
     <Compile Include="Exceptions\CodeExceptions\CodeIsNotValidException.cs" />
+    <Compile Include="Exceptions\EmailIsAlredyTakenException.cs" />
     <Compile Include="Exceptions\EmailNotFoundException.cs" />
+    <Compile Include="Exceptions\LoginsAreNotUniqException.cs" />
     <Compile Include="Exceptions\PasswordExceptions\NewPasswordDoesNotApplyPolicyException.cs" />
     <Compile Include="Exceptions\PasswordExceptions\WrongOldPasswordException.cs" />
     <Compile Include="Generator.cs" />

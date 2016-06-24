@@ -14,7 +14,7 @@ export default function createRequestPromise(method, data, endpoint) {
     props['body'] = JSON.stringify(data)
   return fetch(endpoint, props)
   .then(checkStatus)
-  .then(res => (requestHasData) ? res.json() : res.text())
+  .then(res => res.json())
 }
 
 function checkStatus(res) {
@@ -23,7 +23,7 @@ function checkStatus(res) {
   else {
     var json = res.json()
     return json.then(err => {
-      err.status = res.statusText
+      //err.status = res.statusText
       throw err
     })
   }

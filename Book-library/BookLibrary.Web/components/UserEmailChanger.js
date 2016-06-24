@@ -18,6 +18,11 @@ export default class UserEmailChanger extends Component {
     this.setState({ editing: false })
   }
 
+  handleChangeEmail() {
+    var newEmailValue = $('[name=email]').val()
+    this.props.onClick(newEmailValue)
+  }
+
   renderEmailSection() {
     const { email } = this.props
     const { editing } = this.state
@@ -31,7 +36,7 @@ export default class UserEmailChanger extends Component {
 
           <div className="col-sm-4">
             <ButtonGroup className="pull-right">
-              <Button className="btn-primary">
+              <Button className="btn-primary" onClick={ this.handleChangeEmail.bind(this) }>
                 Change
               </Button>
               <Button onClick={ this.handleCancelChangeEmailBtnClick.bind(this) }>

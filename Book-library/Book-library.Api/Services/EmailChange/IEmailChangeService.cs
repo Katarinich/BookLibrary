@@ -1,10 +1,10 @@
 ﻿namespace BookLibrary.Api.Services
 {
-    interface IEmailChangeService
+    public interface IEmailChangeService
     {
-        void SendConfirmationToNewEmail(string codeValue);
+        bool TrySendConfirmationToNewEmail(string codeValue);
 
-        void ChangeEmail(string codeValue);
+        string ChangeEmail(string codeValue);
 
         void InitiateChangeEmailProcess(int userId, string newEmailValue);
     }

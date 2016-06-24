@@ -7,12 +7,17 @@ export default function user(state = { isFetching: false }, action) {
     case types.REGISTER_USER_REQUEST:
     case types.GET_USERS_REQUEST:
     case types.UPDATE_USER_REQUEST:
+    case types.CONFIRM_EMAIL_REQUEST:
+    case types.INITIATE_USER_EMAIL_CHANGE_REQUEST:
+    case types.CONTINUE_EMAIL_CHANGE_REQUEST:
+    case types.FINISH_EMAIL_CHANGE_REQUEST:
       return {
         ...state,
         isFetching: true
       }
     case types.LOGIN_USER_SUCCESS:
     case types.UPDATE_USER_SUCCESS:
+    case types.FINISH_EMAIL_CHANGE_SUCCESS:
       return {
         ...state,
         currentUser: action.user,
@@ -23,6 +28,9 @@ export default function user(state = { isFetching: false }, action) {
        isFetching: false
      }
     case types.REGISTER_USER_SUCCESS:
+    case types.CONFIRM_EMAIL_SUCCESS:
+    case types.INITIATE_USER_EMAIL_CHANGE_SUCCESS:
+    case types.CONTINUE_EMAIL_CHANGE_SUCCESS:
       return {
         ...state,
         isFetching: false
@@ -31,13 +39,17 @@ export default function user(state = { isFetching: false }, action) {
       return {
         ...state,
         isFetching: false,
-        users: JSON.parse(action.users)
+        users: action.users
       }
     case types.GET_USERS_FAILURE:
     case types.LOGIN_USER_FAILURE:
     case types.LOGOUT_USER_FAILUR:
     case types.REGISTER_USER_FAILURE:
     case types.UPDATE_USER_FAILURE:
+    case types.CONFIRM_EMAIL_FAILURE:
+    case types.INITIATE_USER_EMAIL_CHANGE_FAILURE:
+    case types.CONTINUE_EMAIL_CHANGE_FAILURE:
+    case types.FINISH_EMAIL_CHANGE_FAILURE:
       return {
         ...state,
         isFetching: false,

@@ -26,11 +26,11 @@ namespace BookLibrary.Api.Services
             return code.Email.User;
         }
 
-        public void ValidateCode(string codeValue)
+        public void ValidateCode(string codeValue, ConfirmationCodeType type)
         {
             var code = _confirmationCodeManager.GetConfirmationCodeByValue(codeValue);
 
-            _codeValidationRule.ValidateCode(code);
+            _codeValidationRule.ValidateCode(code, type);
         }
 
         public void DeactivateCodesByType(User user, ConfirmationCodeType type)

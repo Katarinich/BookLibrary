@@ -29,7 +29,7 @@ export default class EditGeneralInformation extends Component {
   }
 
   render() {
-    const { user, hideResponseMessage } = this.props
+    const { user, initiateUserEmailChange } = this.props
     const options = {
       year: 'numeric',
       month: 'long',
@@ -62,7 +62,7 @@ export default class EditGeneralInformation extends Component {
             </div>
           </FormGroup>
 
-          <UserEmailChanger email={ user.email } onClick={ hideResponseMessage }/>
+          <UserEmailChanger email={ user.email } onClick={ initiateUserEmailChange }/>
 
           <FormGroup>
             <ControlLabel bsClass="control-label col-sm-3">Date of Birth</ControlLabel>

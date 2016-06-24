@@ -4,6 +4,6 @@ namespace BookLibrary.Api
 {
     interface ICodeValidationRule
     {
-        void ValidateCode(ConfirmationCode code);
+        void ValidateCode(ConfirmationCode code, ConfirmationCodeType type);
     }
 }

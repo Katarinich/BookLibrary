@@ -5,6 +5,9 @@ import App from './containers/App'
 import Profile from './containers/Profile'
 import MainSection from './containers/MainSection'
 import LoginSection from './containers/LoginSection'
+import EmailConfirmMessage from './containers/EmailConfirmMessage'
+import EmailChangeMessage from './containers/EmailChangeMessage'
+import EmailChangeConfirmMessage from './containers/EmailChangeConfirmMessage'
 
 export default (store) => {
   const requireAuth = (nextState, replace, callback) => {
@@ -22,8 +25,11 @@ export default (store) => {
     <Route component={ App }>
       <Route path="/" component={ MainSection } onEnter={ requireAuth } >
         <Route path="profile/:userId" component={ Profile } />
+        <Route path="email-change/:codeValue" component={ EmailChangeMessage } />
+        <Route path="email-change-confirm/:codeValue" component={ EmailChangeConfirmMessage } />
       </Route>
       <Route path="login" component={ LoginSection } />
+      <Route path="email-confirm/:codeValue" component={ EmailConfirmMessage } />
     </Route>
   )
 }

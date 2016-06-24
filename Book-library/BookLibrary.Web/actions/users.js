@@ -108,6 +108,83 @@ function updateUserFailure(err) {
   }
 }
 
+function confirmEmailRequest() {
+  return {
+    type: types.CONFIRM_EMAIL_REQUEST
+  }
+}
+
+function confirmEmailSuccess() {
+  return {
+    type: types.CONFIRM_EMAIL_SUCCESS
+  }
+}
+
+function confirmEmailFailure(err) {
+  return {
+    type: types.CONFIRM_EMAIL_FAILURE,
+    err
+  }
+}
+
+function initiateUserEmailChangeRequest() {
+  return {
+    type: types.INITIATE_USER_EMAIL_CHANGE_REQUEST
+  }
+}
+
+function initiateUserEmailChangeSuccess() {
+  return {
+    type: types.INITIATE_USER_EMAIL_CHANGE_SUCCESS
+  }
+}
+
+function initiateUserEmailChangeFailure(err) {
+  return {
+    type: types.INITIATE_USER_EMAIL_CHANGE_FAILURE,
+    err
+  }
+}
+
+function continueEmailChangeRequest() {
+  return {
+    type: types.CONTINUE_EMAIL_CHANGE_REQUEST
+  }
+}
+
+function continueEmailChangeSuccess() {
+  return {
+    type: types.CONTINUE_EMAIL_CHANGE_SUCCESS
+  }
+}
+
+function continueEmailChangeFailure(err) {
+  return {
+    type: types.CONTINUE_EMAIL_CHANGE_FAILURE,
+    err
+  }
+}
+
+function finishEmailChangeRequest() {
+  return {
+    type: types.FINISH_EMAIL_CHANGE_REQUEST
+  }
+}
+
+function finishEmailChangeSuccess(user) {
+  return {
+    type: types.FINISH_EMAIL_CHANGE_SUCCESS,
+    user
+  }
+}
+
+function finishEmailChangeFailure(err) {
+  return {
+    type: types.FINISH_EMAIL_CHANGE_FAILURE,
+    err
+  }
+}
+
 export function loginUser(user, location) {
   return (dispatch) => {
     dispatch(loginUserRequest(user))
@@ -180,14 +257,72 @@ export function updateUser(user) {
   }
 }
 
-export function initiateUserEmailChange(user) {
+export function confirmEmail(codeValue) {
   return (dispatch) => {
-    dispatch(initiateUserEmailChangeRequest(user))
-    return request('post', {...user}, `${apiUrl}/email/change`)
+    dispatch(confirmEmailRequest())
+    return request('get', {}, `${apiUrl}/email/confirm/${codeValue}`)
+    .then(res => {
+      dispatch(confirmEmailSuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(confirmEmailFailure(err))
+      dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function initiateUserEmailChange(newEmailValue) {
+  return (dispatch, getState) => {
+    const { currentUser } = getState().users
+    dispatch(initiateUserEmailChangeRequest())
+    return request('post', {...{newEmailValue: newEmailValue, userId: currentUser.id}}, `${apiUrl}/email/change/initiate`)
     .then(res => {
       dispatch(initiateUserEmailChangeSuccess())
 
       dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(initiateUserEmailChangeFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function continueEmailChange(codeValue) {
+  return (dispatch) => {
+    dispatch(continueEmailChangeRequest())
+    return request('get', {}, `${apiUrl}/email/change/continue/${codeValue}`)
+    .then(res => {
+      dispatch(continueEmailChangeSuccess())
+
+      dispatch(showResponseMessage(res, 'success'))
+    })
+    .catch(err => {
+      dispatch(continueEmailChangeFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger'))
+    })
+  }
+}
+
+export function finishEmailChange(codeValue) {
+  return (dispatch, getState) => {
+    dispatch(finishEmailChangeRequest())
+    return request('get', {}, `${apiUrl}/email/change/finish/${codeValue}`)
+    .then(res => {
+      let user = getState().users.currentUser
+      user.email = res
+      dispatch(finishEmailChangeSuccess(user))
+
+      dispatch(showResponseMessage(`Email was changed to ${res}.`, 'success'))
+    })
+    .catch(err => {
+      dispatch(finishEmailChangeFailure(err))
+
+      dispatch(showResponseMessage(err, 'danger'))
     })
   }
 }

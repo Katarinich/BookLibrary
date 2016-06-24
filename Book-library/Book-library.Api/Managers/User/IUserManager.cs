@@ -11,7 +11,7 @@ namespace BookLibrary.Api.Managers
 
         void AddUser(User user);
 
-        void UpdateUser();
+        bool UpdateUser();
 
         List<User> GetAllUsers();
     }

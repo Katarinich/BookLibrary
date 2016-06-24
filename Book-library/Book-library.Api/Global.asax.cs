@@ -27,9 +27,13 @@ namespace BookLibrary.Api
             container.Register<INotificationTransportService, NotificationTransportService>(Lifestyle.Scoped);
             container.Register<IUserService, UserService>(Lifestyle.Scoped);
             container.Register<IJwtService, JwtService>(Lifestyle.Scoped);
+            container.Register<IEmailChangeService, EmailChangeService>(Lifestyle.Scoped);
             container.Register<IAuthentificationService, AuthentificationService>(Lifestyle.Scoped);
             container.Register<IRegistrationService, RegistrationService>(Lifestyle.Scoped);
             container.Register<IConfirmationSenderService, ConfirmationSenderService>(Lifestyle.Scoped);
+            container.Register<IEmailConfirmationService, EmailConfirmationService>(Lifestyle.Scoped);
+            container.Register<IConfirmationCodeService, ConfirmationCodeService>(Lifestyle.Scoped);
+            container.Register<ICodeValidationRule, CodeValidationRule>(Lifestyle.Scoped);
 
             container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
 

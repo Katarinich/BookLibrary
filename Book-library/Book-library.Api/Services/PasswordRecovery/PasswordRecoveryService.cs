@@ -16,7 +16,7 @@
 
         public void RecoverPassword(string newPasswordValue, string codeValue)
         {
-            _confirmationCodeService.ValidateCode(codeValue);
+            _confirmationCodeService.ValidateCode(codeValue, Models.ConfirmationCodeType.PasswordRecovery);
             
             var user = _confirmationCodeService.GetRelatedUser(codeValue);
 

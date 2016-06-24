@@ -4,7 +4,7 @@ namespace BookLibrary.Api.Services
 {
     interface IConfirmationCodeService
     {
-        void ValidateCode(string codeValue);
+        void ValidateCode(string codeValue, ConfirmationCodeType type);
 
         User GetRelatedUser(string codeValue);
 

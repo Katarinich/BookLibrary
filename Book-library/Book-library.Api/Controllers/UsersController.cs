@@ -7,6 +7,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Linq;
+using Newtonsoft.Json.Linq;
+using BookLibrary.Api.Exceptions;
+using BookLibrary.Api.Exceptions.CodeExceptions;
 
 namespace BookLibrary.Api.Controllers
 {
@@ -18,15 +21,19 @@ namespace BookLibrary.Api.Controllers
         private IConfirmationSenderService _confirmationSenderService;
         private IAuthentificationService _autentificationService;
         private IJwtService _jwtService;
+        private IEmailChangeService _emailChangeService;
+        private IEmailConfirmationService _emailConfirmationService;
 
         public UsersController(IUserService userService, IRegistrationService registrationalService, IConfirmationSenderService confirmationalService, 
-            IAuthentificationService authentificationSerice, IJwtService jwtService)
+            IAuthentificationService authentificationSerice, IJwtService jwtService, IEmailChangeService emailChangeService, IEmailConfirmationService emailConfirmationService)
         {
+            _emailChangeService = emailChangeService;
             _userService = userService;
             _jwtService = jwtService;
             _autentificationService = authentificationSerice;
             _registrationService = registrationalService;
             _confirmationSenderService = confirmationalService;
+            _emailConfirmationService = emailConfirmationService;
         }
 
         [Route("")]
@@ -149,6 +156,61 @@ namespace BookLibrary.Api.Controllers
             };
 
             return Request.CreateResponse(HttpStatusCode.OK, userDTO);
+        }
+
+        [Route("email/confirm/{codeValue}")]
+        [HttpGet]
+        public HttpResponseMessage ConfirmEmail(string codeValue)
+        {
+            if (!_emailConfirmationService.TryAcceptConfirmation(codeValue))
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
+            return Request.CreateResponse(HttpStatusCode.OK, "Email was confirmed.");
+        } 
+
+        [Route("email/change/initiate")]
+        [HttpPost]
+        public HttpResponseMessage InitiateEmailChange(JObject user)
+        {
+            var userId = (int)user["userId"];
+            var newEmailValue = user["newEmailValue"].ToString();
+
+            try
+            {
+                _emailChangeService.InitiateChangeEmailProcess(userId, newEmailValue);
+            }
+            catch (EmailIsAlredyTakenException ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, "Email with confirmation was sended on your current email address.");
+        }
+
+        [Route("email/change/continue/{codeValue}")]
+        [HttpGet]
+        public HttpResponseMessage ContinueEmailChange(string codeValue)
+        {
+            if(!_emailChangeService.TrySendConfirmationToNewEmail(codeValue))
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
+            return Request.CreateResponse(HttpStatusCode.OK, "Email with confirmation was sended on your new email address.");
+        }
+
+        [Route("email/change/finish/{codeValue}")]
+        [HttpGet]
+        public HttpResponseMessage FinishEmailChange(string codeValue)
+        {
+            string newEmailValue;
+
+            try
+            {
+                newEmailValue = _emailChangeService.ChangeEmail(codeValue);
+            }
+            catch(CodeIsNotValidException)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, newEmailValue);
         }
     }
 }

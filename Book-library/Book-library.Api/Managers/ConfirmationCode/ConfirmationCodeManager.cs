@@ -28,13 +28,14 @@ namespace BookLibrary.Api.Managers
                 .Include("Email.User")
                 .Include("Email.User.Emails")
                 .Include("Email.User.Credentials")
+                .Include("Email.User.Credentials.Logins")
                 .Include("Email.User.Credentials.Passwords")
                 .FirstOrDefault(c => c.Value == codeValue);
         }
 
         public List<ConfirmationCode> GetConfirmationCodesByUserId(int userId)
         {
-            return _context.Codes.ToList().FindAll(cc => cc.Email.User.UserId == userId);
+            return _context.Codes.Include("Email").Include("Email.User").ToList().FindAll(cc => cc.Email.User.UserId == userId);
         }
 
         public void UpdateCode()

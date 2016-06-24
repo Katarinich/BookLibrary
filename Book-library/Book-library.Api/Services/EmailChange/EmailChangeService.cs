@@ -1,6 +1,8 @@
 ﻿using BookLibrary.Api.Models;
 using BookLibrary.Api.Exceptions.CodeExceptions;
 using BookLibrary.Api.Managers;
+using BookLibrary.Api.Exceptions;
+using System;
 
 namespace BookLibrary.Api.Services
 {
@@ -32,14 +34,23 @@ namespace BookLibrary.Api.Services
             newEmail.Value = newEmailValue;
 
             user.AddEmail(newEmail);
-            _userManager.UpdateUser();
+
+            if(!_userManager.UpdateUser()) throw new EmailIsAlredyTakenException("Email is alredy taken!");
 
             _senderService.SendConfirmation(user.Email, ConfirmationCodeType.EmailChange);
         }
 
-        public void SendConfirmationToNewEmail(string codeValue)
+        public bool TrySendConfirmationToNewEmail(string codeValue)
         {
-            _confirmationCodeService.ValidateCode(codeValue);
+            try
+            {
+                _confirmationCodeService.ValidateCode(codeValue, ConfirmationCodeType.EmailChange);
+            }
+            catch (Exception ex)
+                when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeExpirationDateIsUpException)
+            {
+                return false;
+            }
 
             _confirmationCodeService.DeactivateCode(codeValue);
 
@@ -47,14 +58,18 @@ namespace BookLibrary.Api.Services
             var newEmailValue = user.Emails.FindLast(x => x.IsConfirmed == false).Value;
 
             _senderService.SendConfirmation(newEmailValue, ConfirmationCodeType.EmailConfirmation);
+
+            return true;
         }
 
-        public void ChangeEmail(string codeValue)
+        public string ChangeEmail(string codeValue)
         {
+            string newEmailValue;
+
             if (_emailConfirmationService.TryAcceptConfirmation(codeValue))
             {
                 var user = _confirmationCodeService.GetRelatedUser(codeValue);
-                var newEmailValue = _confirmationCodeService.GetCodeByValue(codeValue).Email.Value;
+                newEmailValue = _confirmationCodeService.GetCodeByValue(codeValue).Email.Value;
 
                 user.ChangeEmailTo(newEmailValue);
 
@@ -62,6 +77,8 @@ namespace BookLibrary.Api.Services
             }
 
             else throw new CodeIsNotValidException(codeValue);
+
+            return newEmailValue;
         }
     }
 }

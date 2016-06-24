@@ -1,4 +1,5 @@
-﻿using BookLibrary.Api.Managers;
+﻿using Book_library.Api.Exceptions;
+using BookLibrary.Api.Managers;
 using BookLibrary.Api.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace BookLibrary.Api.Services
             userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.Username).Value = updatedUser.UserName;
             userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.MobilePhone).Value = updatedUser.MobilePhone.Value;
 
-            _userManager.UpdateUser();
+            if (!_userManager.UpdateUser()) throw new LoginsAreNotUniqException("Email or telephone is not uniq.");
 
             return userToUpdate;
         }

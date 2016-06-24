@@ -1,4 +1,5 @@
 ﻿using BookLibrary.Api.Exceptions.CodeExceptions;
+using BookLibrary.Api.Models;
 using System;
 
 namespace BookLibrary.Api.Services
@@ -16,10 +17,10 @@ namespace BookLibrary.Api.Services
         {
             try
             {
-                _confirmationCodeService.ValidateCode(codeValue);
+                _confirmationCodeService.ValidateCode(codeValue, ConfirmationCodeType.EmailConfirmation);
             }
             catch(Exception ex) 
-                when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeIsNotValidException)
+                when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeExpirationDateIsUpException)
             {
                 return false;
             }
