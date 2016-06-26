@@ -28,7 +28,7 @@ namespace BookLibrary.Api.Services
             if (oldPassword.Value != _passwordHasher.GetHash(oldPasswordValue))
                 throw new OldPasswordWrongException("Old password is wrong");
 
-            if (_passwordPolicy.SatisfiesPolicy(user, newPasswordValue))
+            if (!_passwordPolicy.SatisfiesPolicy(user, newPasswordValue))
                 throw new PasswordDoesNotSatisfyPolicyException("New password does not apply password policy.");
 
 

@@ -315,6 +315,9 @@ export function updateUser(user) {
     })
     .catch(err => {
       dispatch(updateUserFailure(err))
+
+      if(err == 403)
+        browserHistory.push('/login')
     })
   }
 }
@@ -330,16 +333,20 @@ export function confirmEmail(codeValue) {
     })
     .catch(err => {
       dispatch(confirmEmailFailure(err))
+
       dispatch(showResponseMessage(err, 'danger'))
+
+      if(err == 403)
+        browserHistory.push('/login')
     })
   }
 }
 
 export function initiateUserEmailChange(newEmailValue) {
   return (dispatch, getState) => {
-    const { user } = getState().users
+    const user = getState().users.currentUser
     dispatch(initiateUserEmailChangeRequest())
-    return request('post', {...{newEmailValue: newEmailValue, userId: currentUser.id}}, `${apiUrl}/email/change/initiate`)
+    return request('post', {...{newEmailValue: newEmailValue, userId: user.id}}, `${apiUrl}/email/change/initiate`)
     .then(res => {
       dispatch(initiateUserEmailChangeSuccess())
 
@@ -348,7 +355,10 @@ export function initiateUserEmailChange(newEmailValue) {
     .catch(err => {
       dispatch(initiateUserEmailChangeFailure(err))
 
-      dispatch(showResponseMessage(err, 'danger'))
+      if (err != 403) dispatch(showResponseMessage(err, 'danger'))
+
+      if(err == 403)
+        browserHistory.push('/login')
     })
   }
 }
@@ -438,7 +448,10 @@ export function passwordChange(oldPasswordValue, newPasswordValue) {
     .catch(err => {
       dispatch(passwordChangeFailure(err))
 
-      dispatch(showResponseMessage(err, 'danger') )
+      if (err != 403) dispatch(showResponseMessage(err, 'danger'))
+
+      if(err == 403)
+        browserHistory.push('/login')
     })
   }
 }

@@ -54,7 +54,7 @@ namespace BookLibrary.Api.Services
 
             var tokenObject = JsonConvert.DeserializeObject<JObject>(json);
             var experationTimeStamp = (int)tokenObject["exp"];
-            var experationDate = new DateTime(experationTimeStamp);
+            var experationDate = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddSeconds(experationTimeStamp);
 
             if (DateTime.Compare(DateTime.UtcNow, experationDate) > 0)
             {
@@ -62,7 +62,7 @@ namespace BookLibrary.Api.Services
             }
             return true;
         }
-
+        
         public void DeactivateToken(string tokenValue)
         {
             var token = _tokenManager.GetTokenByValue(tokenValue);

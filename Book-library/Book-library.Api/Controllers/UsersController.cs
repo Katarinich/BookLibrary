@@ -46,9 +46,8 @@ namespace BookLibrary.Api.Controllers
         [HttpGet]
         public HttpResponseMessage GetAllUsers(HttpRequestMessage request)
         {
-            if (request.Headers.Authorization == null || !_jwtService.ValidateToken("ololo"))
+            if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
-
 
             var users = _userService.GetAllUsers();
             List<UserDTO> usersDTO = new List<UserDTO>();
@@ -140,8 +139,11 @@ namespace BookLibrary.Api.Controllers
         }
 
         [Route("update")]
-        public HttpResponseMessage UpdateUser(UserDraft userDraft)
+        public HttpResponseMessage UpdateUser(HttpRequestMessage request, UserDraft userDraft)
         {
+            if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
+
             var userBuilder = new UserBuilder();
             var updatedUser = userBuilder.BuildUser(userDraft);
             var user = _userService.UpdateUser(updatedUser);
@@ -180,8 +182,11 @@ namespace BookLibrary.Api.Controllers
 
         [Route("email/change/initiate")]
         [HttpPost]
-        public HttpResponseMessage InitiateEmailChange(JObject user)
+        public HttpResponseMessage InitiateEmailChange(HttpRequestMessage request, JObject user)
         {
+            if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
+
             var userId = (int)user["userId"];
             var newEmailValue = user["newEmailValue"].ToString();
 
@@ -201,7 +206,7 @@ namespace BookLibrary.Api.Controllers
         [HttpGet]
         public HttpResponseMessage ContinueEmailChange(string codeValue)
         {
-            if(!_emailChangeService.TrySendConfirmationToNewEmail(codeValue))
+            if (!_emailChangeService.TrySendConfirmationToNewEmail(codeValue))
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
             return Request.CreateResponse(HttpStatusCode.OK, "Email with confirmation was sended on your new email address.");
         }
@@ -226,8 +231,11 @@ namespace BookLibrary.Api.Controllers
 
         [Route("password/change")]
         [HttpPost]
-        public HttpResponseMessage ChangePassword(JObject passwords)
+        public HttpResponseMessage ChangePassword(HttpRequestMessage request, JObject passwords)
         {
+            if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
+                return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
+
             var userId = (int)passwords["userId"];
             var oldPasswordValue = passwords["oldPasswordValue"].ToString();
             var newPasswordValue = passwords["newPasswordValue"].ToString();
