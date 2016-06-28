@@ -12,8 +12,12 @@ var compiler = webpack(config);
 app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
 app.use(webpackHotMiddleware(compiler));
 
+var staticPath = path.resolve(__dirname, 'static');
+
+app.use(express.static(staticPath));
+
 app.use(function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(staticPath + '/index.html');
 });
 
 app.listen(port, function(error) {

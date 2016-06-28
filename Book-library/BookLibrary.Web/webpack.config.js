@@ -9,6 +9,7 @@ var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
 // defining environment vars
 //
 
+
 var NODE_ENV = process.env.NODE_ENV;
 var APP_ENV = process.env.APP_ENV;
 
@@ -46,20 +47,41 @@ module.exports = {
           : '#cheap-module-eval-source-map',
   //
   entry: {
+    libs: [
+      'file-loader'
+      , 'history'
+      , 'jquery'
+      , 'lodash'
+      , 'moment'
+      , 'underscore'
+    ]
+    ,
     react: [
       'react'
       , 'react-dom'
+      , 'react-addons-css-transition-group'
       , 'react-bootstrap'
+      , 'react-datepicker'
+      , 'react-fontawesome'
       , 'react-router'
+      , 'mdast-react'
+      , 'react-transform-hmr'
+      , 'griddle-react'
     ]
     ,
     redux: [
       'redux'
       , 'react-redux'
       , 'redux-logger'
+      , 'redux-router'
       , 'redux-thunk'
-    ],
+    ]
+    ,
     'index' : addHotEntries([
+      './index.js'
+    ])
+    ,
+    'system' : addHotEntries([
       './index.js'
     ])
   },
