@@ -23,7 +23,6 @@ namespace BookLibrary.Api
             container.Register<IEmailManager, EmailManager>(Lifestyle.Scoped);
             container.Register<ICodeGenerator, CodeGenerator>(Lifestyle.Scoped);
             container.Register<IPasswordHasher, PasswordHasher>(Lifestyle.Scoped);
-            container.Register<ITokenManager, TokenManager>(Lifestyle.Scoped);
             container.Register<INotificationTransportService, NotificationTransportService>(Lifestyle.Scoped);
             container.Register<IUserService, UserService>(Lifestyle.Scoped);
             container.Register<IJwtService, JwtService>(Lifestyle.Scoped);

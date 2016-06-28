@@ -28,7 +28,8 @@ namespace BookLibrary.Api.Models
         public MobilePhone MobilePhone { get; set; }
         public List<Role> UserRoles { get; set; }
 
-        public string Email => Emails.Find(e => e.IsActive).Value;
+        public string Email => Emails.Find(e => e.IsActive && e.IsConfirmed)?.Value;
+        public string PendingEmail => Emails.FindLast(x => x.IsConfirmed == false)?.Value;
 
         public void ChangeEmailTo(string newEmailValue)
         {

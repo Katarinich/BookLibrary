@@ -36,7 +36,7 @@ namespace BookLibrary.Api.Services
 
         public User UpdateUser(User updatedUser)
         {
-            var userToUpdate = _userManager.GetUserByLogin(updatedUser.Email);
+            var userToUpdate = _userManager.GetUserByLogin(updatedUser.Emails.First().Value);
 
             userToUpdate.Address.AddressLine = updatedUser.Address.AddressLine;
             userToUpdate.Address.City = updatedUser.Address.City;
@@ -51,7 +51,7 @@ namespace BookLibrary.Api.Services
             userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.Username).Value = updatedUser.UserName;
             userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.MobilePhone).Value = updatedUser.MobilePhone.Value;
 
-            if (!_userManager.UpdateUser()) throw new LoginsAreNotUniqException("Email or telephone is not uniq.");
+            if (!_userManager.UpdateUser()) throw new LoginsAreNotUniqException("Username or mobile phone is already taken.");
 
             return userToUpdate;
         }

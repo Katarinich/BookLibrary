@@ -1,6 +1,8 @@
 import { browserHistory } from 'react-router'
+import moment from 'moment'
 
 import request from './utils/request'
+import getDecodedTokenData from './utils/decode-token'
 import * as types from '../constants/actionTypes'
 import { showResponseMessage } from './response'
 
@@ -16,7 +18,8 @@ function loginUserRequest(user) {
 function loginUserSuccess(user) {
   return {
     type: types.LOGIN_USER_SUCCESS,
-    user
+    user: user.user,
+    token: user.token
   }
 }
 
@@ -76,7 +79,8 @@ function getUsersRequest() {
 function getUsersSuccess(users) {
   return {
     type: types.GET_USERS_SUCCESS,
-    users
+    users: users.users,
+    token: users.token
   }
 }
 
@@ -97,14 +101,16 @@ function updateUserRequest(user) {
 function updateUserSuccess(user) {
   return {
     type: types.UPDATE_USER_SUCCESS,
-    user
+    user: user.user,
+    token: user.token
   }
 }
 
 function updateUserFailure(err) {
   return {
     type: types.UPDATE_USER_FAILURE,
-    err
+    err: err.message,
+    token: err.token
   }
 }
 
@@ -133,9 +139,10 @@ function initiateUserEmailChangeRequest() {
   }
 }
 
-function initiateUserEmailChangeSuccess() {
+function initiateUserEmailChangeSuccess(response) {
   return {
-    type: types.INITIATE_USER_EMAIL_CHANGE_SUCCESS
+    type: types.INITIATE_USER_EMAIL_CHANGE_SUCCESS,
+    pendingEmail: response.pendingEmail
   }
 }
 
@@ -171,10 +178,10 @@ function finishEmailChangeRequest() {
   }
 }
 
-function finishEmailChangeSuccess(user) {
+function finishEmailChangeSuccess(newEmailValue) {
   return {
     type: types.FINISH_EMAIL_CHANGE_SUCCESS,
-    user
+    newEmailValue
   }
 }
 
@@ -255,6 +262,7 @@ export function loginUser(user, location) {
     })
     .catch(err => {
       dispatch(loginUserFailure(err))
+      dispatch(showResponseMessage(err, 'danger'))
     })
   }
 }
@@ -275,25 +283,20 @@ export function registerUser(user) {
   }
 }
 
-export function logoutUser(user) {
-  return (dispatch) => {
-    dispatch(logoutUserRequest(user))
-    return request('post', {...user}, `${apiUrl}/logout`)
-    .then(() => {
-      dispatch(logoutUserSuccess())
-    })
-    .catch(err => {
-      dispatch(logoutUserFailure(err))
-    })
+export function logoutUser() {
+  browserHistory.push('/login')
+
+  return {
+    type: types.LOGOUT_USER
   }
 }
 
 export function getUsers() {
   return (dispatch, getState) => {
     dispatch(getUsersRequest())
-    let { tokenValue } = getState().users.currentUser
+    let { token } = getState().users
 
-    return request('get', {}, apiUrl, tokenValue)
+    return request('get', {}, apiUrl, token)
     .then(users => {
       dispatch(getUsersSuccess(users))
     })
@@ -301,23 +304,28 @@ export function getUsers() {
       dispatch(getUsersFailure(err))
 
       if(err == 403)
-        browserHistory.push('/login')
+        dispatch(logoutUser())
     })
   }
 }
 
 export function updateUser(user) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch(updateUserRequest(user))
-    return request('post', {...user}, `${apiUrl}/update`)
+    let { token } = getState().users
+
+    return request('post', {...user}, `${apiUrl}/update`, token)
     .then(user => {
       dispatch(updateUserSuccess(user))
+
+      dispatch(showResponseMessage('User was updated', 'success'))
     })
     .catch(err => {
       dispatch(updateUserFailure(err))
 
       if(err == 403)
-        browserHistory.push('/login')
+        dispatch(logoutUser())
+      else dispatch(showResponseMessage(err.message, 'danger'))
     })
   }
 }
@@ -335,9 +343,6 @@ export function confirmEmail(codeValue) {
       dispatch(confirmEmailFailure(err))
 
       dispatch(showResponseMessage(err, 'danger'))
-
-      if(err == 403)
-        browserHistory.push('/login')
     })
   }
 }
@@ -346,19 +351,21 @@ export function initiateUserEmailChange(newEmailValue) {
   return (dispatch, getState) => {
     const user = getState().users.currentUser
     dispatch(initiateUserEmailChangeRequest())
-    return request('post', {...{newEmailValue: newEmailValue, userId: user.id}}, `${apiUrl}/email/change/initiate`)
-    .then(res => {
-      dispatch(initiateUserEmailChangeSuccess())
+    let { token } = getState().users
 
-      dispatch(showResponseMessage(res, 'success'))
+    return request('post', {...{newEmailValue: newEmailValue, userId: user.id}}, `${apiUrl}/email/change/initiate`, token)
+    .then(res => {
+      dispatch(initiateUserEmailChangeSuccess(res))
+
+      dispatch(showResponseMessage(res.message, 'success'))
     })
     .catch(err => {
       dispatch(initiateUserEmailChangeFailure(err))
 
-      if (err != 403) dispatch(showResponseMessage(err, 'danger'))
+      if (err != 403) dispatch(showResponseMessage(err.message, 'danger'))
 
       if(err == 403)
-        browserHistory.push('/login')
+        dispatch(logoutUser())
     })
   }
 }
@@ -437,21 +444,39 @@ export function finishPasswordRecovery(codeValue, newPasswordValue) {
 export function passwordChange(oldPasswordValue, newPasswordValue) {
   return (dispatch, getState) => {
     const user = getState().users.currentUser
+    let { token } = getState().users
+
     dispatch(passwordChangeRequest())
 
-    return request('post', {...{userId: user.id, oldPasswordValue: oldPasswordValue, newPasswordValue: newPasswordValue}}, `${apiUrl}/password/change`)
+    return request('post', {...{userId: user.id, oldPasswordValue: oldPasswordValue, newPasswordValue: newPasswordValue}}, `${apiUrl}/password/change`, token)
     .then(res => {
       dispatch(passwordChangeSuccess())
 
-      dispatch(showResponseMessage(res, 'success'))
+      dispatch(showResponseMessage(res.message, 'success'))
     })
     .catch(err => {
       dispatch(passwordChangeFailure(err))
 
-      if (err != 403) dispatch(showResponseMessage(err, 'danger'))
+      if (err != 403) dispatch(showResponseMessage(err.message, 'danger'))
 
       if(err == 403)
-        browserHistory.push('/login')
+        dispatch(logoutUser())
     })
+  }
+}
+
+export function restoreSignedInUser() {
+  return (dispatch, getState) => {
+    var { users } = getState()
+
+    if (!users.token) {
+        return
+    }
+
+    var tokenData = getDecodedTokenData(users.token)
+
+    if(moment.unix(tokenData.expiryDate).isBefore(moment())){
+      return dispatch(logoutUser())
+    }
   }
 }

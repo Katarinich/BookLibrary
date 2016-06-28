@@ -5,15 +5,15 @@ import { Router, browserHistory } from 'react-router'
 
 import configureStore from './store/configureStore'
 import configRoutes from './routes'
+import { restoreSignedInUser } from './actions'
 
 const store = configureStore()
 const routes = configRoutes(store)
+store.dispatch(restoreSignedInUser())
 
 render(
   <Provider store={store}>
-    <div>
     <Router history={browserHistory} routes={routes} />
-    </div>
   </Provider>,
   document.getElementById('root')
 )

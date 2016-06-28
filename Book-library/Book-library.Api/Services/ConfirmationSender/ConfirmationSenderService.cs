@@ -9,6 +9,7 @@ namespace BookLibrary.Api.Services
         private IEmailManager _emailManager;
         private ICodeGenerator _codeGenerator;
         private INotificationTransportService _notificationTransportService;
+        private readonly string clientUrl = "http://localhost:3000";
 
         public ConfirmationSenderService(IConfirmationCodeManager codeManager, IEmailManager emailManager, 
             ICodeGenerator codeGenerator, INotificationTransportService notificationTransportService)
@@ -27,9 +28,31 @@ namespace BookLibrary.Api.Services
 
             if (email == null) throw new EmailNotFoundException(emailValue);
 
+            string linkType;
+
             _codeManager.SaveCode(code, email);
 
-            _notificationTransportService.SendNotification(emailValue, code.Value);
+            if (type == ConfirmationCodeType.EmailChange)
+            {
+                linkType = "/email-change/";
+            }
+            else if (type == ConfirmationCodeType.EmailChangeConfirmation)
+            {
+                linkType = "/email-change-confirm/";
+            }
+            else if (type == ConfirmationCodeType.EmailConfirmation)
+            {
+                linkType = "/email-confirm/";
+            }
+            else
+            {
+                linkType = "/password-recover/";
+            }
+
+
+            var linkWithCode = clientUrl + linkType + code.Value;
+
+            _notificationTransportService.SendNotification(emailValue, linkWithCode);
         }
     }
 }

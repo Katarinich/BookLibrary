@@ -62,7 +62,7 @@ export default class EditGeneralInformation extends Component {
             </div>
           </FormGroup>
 
-          <UserEmailChanger email={ user.email } onClick={ initiateUserEmailChange }/>
+          <UserEmailChanger email={ user.email } pendingEmail={ user.pendingEmail } onClick={ initiateUserEmailChange }/>
 
           <FormGroup>
             <ControlLabel bsClass="control-label col-sm-3">Date of Birth</ControlLabel>

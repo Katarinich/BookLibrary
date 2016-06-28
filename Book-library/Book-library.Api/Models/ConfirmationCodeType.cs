@@ -4,6 +4,7 @@
     {
         EmailConfirmation,
         EmailChange,
+        EmailChangeConfirmation,
         PasswordRecovery
     }
 }

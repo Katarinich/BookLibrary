@@ -63,7 +63,7 @@ namespace BookLibrary.Api.Managers
             {
                 _context.SaveChanges();
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 return false;
             }

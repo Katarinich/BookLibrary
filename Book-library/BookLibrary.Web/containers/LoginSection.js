@@ -1,12 +1,17 @@
 import React, { Component } from 'react'
 import { Nav, NavItem } from 'react-bootstrap'
 import { connect } from 'react-redux'
+import { browserHistory } from 'react-router'
 
 import RegistrationForm from '../components/RegistrationForm'
 import LoginForm from '../components/LoginForm'
 import { loginUser, registerUser, initiatePasswordRecovery, hideResponseMessage } from '../actions'
 
 class LoginSection extends Component {
+  componentWillMount() {
+    if(this.props.users.currentUser) browserHistory.push('/')
+  }
+
   constructor(props) {
     super(props)
 
@@ -35,7 +40,7 @@ class LoginSection extends Component {
           </Nav>
         </div>
         <div style={{paddingTop: '10px'}}>
-          { login ? <LoginForm type={ type } message={ message } onSubmitRecovery={ initiatePasswordRecovery } onSubmit={ loginUser } location={ location }/>
+          { login ? <LoginForm type={ type } message={ message } onUnmount={ hideResponseMessage } onSubmitRecovery={ initiatePasswordRecovery } onSubmit={ loginUser } location={ location }/>
                   : <RegistrationForm type={ type } message={ message } onUnmount={ hideResponseMessage } onSubmit={ registerUser }/> }
         </div>
       </div>

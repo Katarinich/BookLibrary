@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import ProfileViewer from '../components/ProfileViewer'
 import ProfileEditor from '../components/ProfileEditor'
-import { updateUser, initiateUserEmailChange, passwordChange } from '../actions'
+import { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage } from '../actions'
 
 class Profile extends Component {
   render() {
@@ -18,6 +18,7 @@ class Profile extends Component {
                                         updateGeneralUserInfo={ this.props.updateUser }
                                         initiateUserEmailChange={ this.props.initiateUserEmailChange }
                                         passwordChange={ this.props.passwordChange }
+                                        onUnmount={ this.props.hideResponseMessage }
                                         user={ currentUser }
                                         type={ type }
                                         message={ message } />
@@ -31,4 +32,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps, { updateUser, initiateUserEmailChange, passwordChange })(Profile)
+export default connect(mapStateToProps, { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage })(Profile)

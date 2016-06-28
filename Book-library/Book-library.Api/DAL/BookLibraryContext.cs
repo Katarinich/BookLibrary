@@ -19,7 +19,6 @@ namespace BookLibrary.Api.DAL
         public DbSet<MobilePhone> MobilePhones { get; set; }
         public DbSet<ConfirmationCode> Codes { get; set; }
         public DbSet<Email> Emails { get; set; }
-        public DbSet<Token> Tokens { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

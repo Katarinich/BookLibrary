@@ -21,10 +21,11 @@ export default class UserEmailChanger extends Component {
   handleChangeEmail() {
     var newEmailValue = $('[name=email]').val()
     this.props.onClick(newEmailValue)
+    this.setState({ editing: false })
   }
 
   renderEmailSection() {
-    const { email } = this.props
+    const { email, pendingEmail } = this.props
     const { editing } = this.state
 
     if(editing)
@@ -49,17 +50,25 @@ export default class UserEmailChanger extends Component {
 
     return (
       <div>
-        <div className="col-sm-5">
-          <p className="form-control-static">{email}</p>
+        <div>
+          <div className="col-sm-5">
+            <p className="form-control-static">{email}</p>
+          </div>
+
+          <div className="col-sm-4">
+            <Button
+              className="pull-right"
+              onClick={this.handleChangeEmailBtnClick.bind(this)}>
+              Change Email
+            </Button>
+          </div>
         </div>
 
-        <div className="col-sm-4">
-          <Button
-            className="pull-right"
-            onClick={this.handleChangeEmailBtnClick.bind(this)}>
-            Change Email
-          </Button>
-        </div>
+        { pendingEmail && <div>
+          <div className="col-sm-offset-3 col-sm-5">
+            <p className="form-control-static">({pendingEmail})</p>
+          </div>
+        </div> }
       </div>
     )
   }

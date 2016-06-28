@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using BookLibrary.Api.Exceptions;
 using BookLibrary.Api.Exceptions.CodeExceptions;
 using BookLibrary.Api.Exceptions.PasswordExceptions;
+using Book_library.Api.Exceptions;
 
 namespace BookLibrary.Api.Controllers
 {
@@ -49,10 +50,15 @@ namespace BookLibrary.Api.Controllers
             if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
 
+            var tokenValue = request.Headers.Authorization.Scheme;
+
             var users = _userService.GetAllUsers();
             List<UserDTO> usersDTO = new List<UserDTO>();
 
-            foreach(var user in users)
+            var userId = _jwtService.GetUserIdFromToken(tokenValue);
+            var token = _jwtService.CreateToken(userId);
+
+            foreach (var user in users)
             {
                 usersDTO.Add(new UserDTO()
                 {
@@ -71,7 +77,7 @@ namespace BookLibrary.Api.Controllers
                 });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, usersDTO);
+            return Request.CreateResponse(HttpStatusCode.OK, new { users = usersDTO, token = token });
         }
 
         [Route("signup")]
@@ -102,18 +108,18 @@ namespace BookLibrary.Api.Controllers
         {
             var user = _autentificationService.Authentificate(credentialsDraft);
 
-            if (user == null) return Request.CreateResponse(HttpStatusCode.BadRequest);
+            if (user == null || user.Email == null) return Request.CreateResponse(HttpStatusCode.BadRequest, "Wrong login or password.");
 
-            var token = _jwtService.CreateToken(user);
+            var token = _jwtService.CreateToken(user.UserId);
 
             var userDTO = new UserDTO()
             {
                 Id = user.UserId,
-                TokenValue = token.Value,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
                 Email = user.Email,
+                PendingEmail = user.PendingEmail,
                 MobilePhone = user.MobilePhone.Value,
                 DateOfBirth = (int)user.DateOfBirth.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, 0)).TotalSeconds,
                 Country = user.Address.Country,
@@ -125,17 +131,9 @@ namespace BookLibrary.Api.Controllers
             };
 
 
-            var response = Request.CreateResponse(HttpStatusCode.OK, userDTO);
+            var response = Request.CreateResponse(HttpStatusCode.OK, new { user = userDTO, token = token });
 
             return response;
-        }
-
-        [Route("logout")]
-        public IHttpActionResult Logout(UserDTO userDTO)
-        {
-            _jwtService.DeactivateToken(userDTO.TokenValue);
-
-            return Ok("Logout was successfull.");
         }
 
         [Route("update")]
@@ -144,16 +142,28 @@ namespace BookLibrary.Api.Controllers
             if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
 
+            var tokenValue = request.Headers.Authorization.Scheme;
+
             var userBuilder = new UserBuilder();
             var updatedUser = userBuilder.BuildUser(userDraft);
-            var user = _userService.UpdateUser(updatedUser);
 
-            var token = _jwtService.CreateToken(user);
+            User user;
+            var userId = _jwtService.GetUserIdFromToken(tokenValue);
+
+            var token = _jwtService.CreateToken(userId);
+
+            try
+            {
+                user = _userService.UpdateUser(updatedUser);
+            }
+            catch(LoginsAreNotUniqException ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
+            }
 
             var userDTO = new UserDTO()
             {
                 Id = user.UserId,
-                TokenValue = token.Value,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 UserName = user.UserName,
@@ -168,14 +178,14 @@ namespace BookLibrary.Api.Controllers
                 Roles = user.UserRoles.Select(x => x.Name).ToArray()
             };
 
-            return Request.CreateResponse(HttpStatusCode.OK, userDTO);
+            return Request.CreateResponse(HttpStatusCode.OK, new { user = userDTO, token = token });
         }
 
         [Route("email/confirm/{codeValue}")]
         [HttpGet]
         public HttpResponseMessage ConfirmEmail(string codeValue)
         {
-            if (!_emailConfirmationService.TryAcceptConfirmation(codeValue))
+            if (!_emailConfirmationService.TryAcceptConfirmation(codeValue, ConfirmationCodeType.EmailConfirmation))
                 return Request.CreateResponse(HttpStatusCode.BadRequest, "Code is not valid.");
             return Request.CreateResponse(HttpStatusCode.OK, "Email was confirmed.");
         } 
@@ -189,6 +199,7 @@ namespace BookLibrary.Api.Controllers
 
             var userId = (int)user["userId"];
             var newEmailValue = user["newEmailValue"].ToString();
+            var token = _jwtService.CreateToken(userId);
 
             try
             {
@@ -196,10 +207,10 @@ namespace BookLibrary.Api.Controllers
             }
             catch (EmailIsAlredyTakenException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Email with confirmation was sended on your current email address.");
+            return Request.CreateResponse(HttpStatusCode.OK, new { message = "Email with confirmation was sended on your current email address.", token = token, pendingEmail = newEmailValue });
         }
 
         [Route("email/change/continue/{codeValue}")]
@@ -239,6 +250,7 @@ namespace BookLibrary.Api.Controllers
             var userId = (int)passwords["userId"];
             var oldPasswordValue = passwords["oldPasswordValue"].ToString();
             var newPasswordValue = passwords["newPasswordValue"].ToString();
+            var token = _jwtService.CreateToken(userId);
 
             try
             {
@@ -246,14 +258,14 @@ namespace BookLibrary.Api.Controllers
             }
             catch(OldPasswordWrongException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
             }
             catch(PasswordDoesNotSatisfyPolicyException ex)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Password was changed.");
+            return Request.CreateResponse(HttpStatusCode.OK, new { message = "Password was changed.", token = token });
         }
 
         [Route("password/recover/initiate")]

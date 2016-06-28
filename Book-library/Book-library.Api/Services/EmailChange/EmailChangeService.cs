@@ -57,7 +57,7 @@ namespace BookLibrary.Api.Services
             var user = _confirmationCodeService.GetRelatedUser(codeValue);
             var newEmailValue = user.Emails.FindLast(x => x.IsConfirmed == false).Value;
 
-            _senderService.SendConfirmation(newEmailValue, ConfirmationCodeType.EmailConfirmation);
+            _senderService.SendConfirmation(newEmailValue, ConfirmationCodeType.EmailChangeConfirmation);
 
             return true;
         }
@@ -66,7 +66,7 @@ namespace BookLibrary.Api.Services
         {
             string newEmailValue;
 
-            if (_emailConfirmationService.TryAcceptConfirmation(codeValue))
+            if (_emailConfirmationService.TryAcceptConfirmation(codeValue, ConfirmationCodeType.EmailChangeConfirmation))
             {
                 var user = _confirmationCodeService.GetRelatedUser(codeValue);
                 newEmailValue = _confirmationCodeService.GetCodeByValue(codeValue).Email.Value;

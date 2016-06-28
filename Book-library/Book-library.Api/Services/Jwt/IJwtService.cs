@@ -4,10 +4,10 @@ namespace BookLibrary.Api.Services
 {
     public interface IJwtService
     {
-        Token CreateToken(User user);
+        string CreateToken(int userId);
 
         bool ValidateToken(string tokenValue);
 
-        void DeactivateToken(string tokenValue);
+        int GetUserIdFromToken(string tokenValue);
     }
 }

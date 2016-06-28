@@ -13,11 +13,11 @@ namespace BookLibrary.Api.Services
             _confirmationCodeService = confirmationCodeService;
         }
 
-        public bool TryAcceptConfirmation(string codeValue)
+        public bool TryAcceptConfirmation(string codeValue, ConfirmationCodeType type)
         {
             try
             {
-                _confirmationCodeService.ValidateCode(codeValue, ConfirmationCodeType.EmailConfirmation);
+                _confirmationCodeService.ValidateCode(codeValue, type);
             }
             catch(Exception ex) 
                 when (ex is CodeIsNotActiveException || ex is CodeIsNotExistException || ex is CodeExpirationDateIsUpException)

@@ -5,6 +5,10 @@ import EditSecurityInformation from './EditSecurityInformation'
 import HttpResponseMessage from './HttpResponseMessage'
 
 export default class ProfileEditor extends Component {
+  componentWillUnmount() {
+    if(this.props.type) this.props.onUnmount()
+  }
+  
   render() {
     const { user, updateGeneralUserInfo, initiateUserEmailChange, type, message, passwordChange } = this.props
 

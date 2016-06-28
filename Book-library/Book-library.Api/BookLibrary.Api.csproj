@@ -214,9 +214,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="ICodeGenerator.cs" />
-    <Compile Include="Managers\Token\ITokenManager.cs" />
-    <Compile Include="Managers\Token\TokenManager.cs" />
-    <Compile Include="Models\Token.cs" />
     <Compile Include="PasswordPolicy\IPasswordPolicy.cs" />
     <Compile Include="PasswordPolicy\PasswordPolicy.cs" />
     <Compile Include="Services\Jwt\JwtService.cs" />
