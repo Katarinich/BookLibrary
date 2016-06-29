@@ -57,17 +57,16 @@ namespace BookLibrary.Api.Managers
                 .FirstOrDefault(u => u.UserId == userId);
         }
 
-        public bool UpdateUser()
+        public void UpdateUser()
         {
             try
             {
                 _context.SaveChanges();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex)
             {
-                return false;
+                throw ex;
             }
-            return true;
         }
 
         public void AddUser(User user)

@@ -13,16 +13,18 @@ namespace BookLibrary.Api.Services
             _userManager = userManager;
         }
 
-        public void RegisterUser(User user)
+        public bool TryRegisterUser(User user)
         {
             try
             {
                 _userManager.AddUser(user);
             }
-            catch(DbUpdateException ex)
+            catch(DbUpdateException)
             {
-                throw ex;
+                return false;
             }
+
+            return true;
         }
     }
 }

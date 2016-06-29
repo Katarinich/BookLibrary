@@ -1,4 +1,4 @@
-﻿using Book_library.Api.Exceptions;
+﻿using BookLibrary.Api.Exceptions;
 using BookLibrary.Api.Managers;
 using BookLibrary.Api.Models;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace BookLibrary.Api.Services
             _userManager = userManager;
         }
 
-        public User GetUserByLogins(string[] logins)
+        public void CheckIfUserExistByLogin(string[] logins)
         {
             User user = null;
 
@@ -23,10 +23,17 @@ namespace BookLibrary.Api.Services
             {
                 user = _userManager.GetUserByLogin(login);
 
-                if (user != null) return user;
+                if (user != null)
+                {
+                    var loginType = user.Credentials.Logins.First(l => l.Value == login).Type;
+                    if (loginType == LoginType.Email)
+                        throw new UserAlreadyExistException("User with this email is already exist");
+                    if (loginType == LoginType.MobilePhone)
+                        throw new UserAlreadyExistException("User with this mobile phone is already exist");
+                    if(loginType == LoginType.Username)
+                        throw new UserAlreadyExistException("User with this username is already exist");
+                }
             }
-
-            return user;
         }
 
         public List<User> GetAllUsers()
@@ -34,10 +41,8 @@ namespace BookLibrary.Api.Services
             return _userManager.GetAllUsers();
         }
 
-        public User UpdateUser(User updatedUser)
+        public User UpdateUser(User userToUpdate, User updatedUser)
         {
-            var userToUpdate = _userManager.GetUserByLogin(updatedUser.Emails.First().Value);
-
             userToUpdate.Address.AddressLine = updatedUser.Address.AddressLine;
             userToUpdate.Address.City = updatedUser.Address.City;
             userToUpdate.Address.Country = updatedUser.Address.Country;
@@ -46,14 +51,26 @@ namespace BookLibrary.Api.Services
             userToUpdate.DateOfBirth = updatedUser.DateOfBirth;
             userToUpdate.FirstName = updatedUser.FirstName;
             userToUpdate.LastName = updatedUser.LastName;
-            userToUpdate.UserName = updatedUser.UserName;
-            userToUpdate.MobilePhone.Value = updatedUser.MobilePhone.Value;
-            userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.Username).Value = updatedUser.UserName;
-            userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.MobilePhone).Value = updatedUser.MobilePhone.Value;
 
-            if (!_userManager.UpdateUser()) throw new LoginsAreNotUniqException("Username or mobile phone is already taken.");
+            if (userToUpdate.UserName != updatedUser.UserName)
+            {
+                userToUpdate.UserName = updatedUser.UserName;
+                userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.Username).Value = updatedUser.UserName;
+            }
 
+            if (userToUpdate.MobilePhone.Value != updatedUser.MobilePhone.Value)
+            {
+                userToUpdate.MobilePhone.Value = updatedUser.MobilePhone.Value;
+                userToUpdate.Credentials.Logins.First(l => l.Type == LoginType.MobilePhone).Value = updatedUser.MobilePhone.Value;
+            }
+
+            _userManager.UpdateUser();
             return userToUpdate;
+        }
+
+        public User GetUserByLogin(string login)
+        {
+            return _userManager.GetUserByLogin(login);
         }
     }
 }

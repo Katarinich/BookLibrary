@@ -5,10 +5,12 @@ namespace BookLibrary.Api.Services
 {
     public interface IUserService
     {
-        User GetUserByLogins(string[] logins);
+        void CheckIfUserExistByLogin(string[] logins);
 
         List<User> GetAllUsers();
 
-        User UpdateUser(User updatedUser);
+        User UpdateUser(User userToUpdate, User updatedUser);
+
+        User GetUserByLogin(string login);
     }
 }

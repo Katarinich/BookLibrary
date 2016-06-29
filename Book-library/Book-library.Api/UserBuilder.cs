@@ -12,7 +12,7 @@ namespace BookLibrary.Api
             var user = new User();
 
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            dtDateTime = dtDateTime.AddSeconds(double.Parse(userToBuild.dateOfBirth));
+            dtDateTime = dtDateTime.AddSeconds(userToBuild.dateOfBirth);
             user.DateOfBirth = dtDateTime;
             user.FirstName = userToBuild.firstName;
             user.LastName = userToBuild.lastName;

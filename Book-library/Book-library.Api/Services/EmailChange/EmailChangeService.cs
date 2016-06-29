@@ -3,6 +3,7 @@ using BookLibrary.Api.Exceptions.CodeExceptions;
 using BookLibrary.Api.Managers;
 using BookLibrary.Api.Exceptions;
 using System;
+using System.Data.Entity.Infrastructure;
 
 namespace BookLibrary.Api.Services
 {
@@ -35,7 +36,14 @@ namespace BookLibrary.Api.Services
 
             user.AddEmail(newEmail);
 
-            if(!_userManager.UpdateUser()) throw new EmailIsAlredyTakenException("Email is alredy taken!");
+            try
+            {
+                _userManager.UpdateUser();
+            }
+            catch (DbUpdateException)
+            {
+                throw new EmailIsAlredyTakenException("Email is alredy taken!");
+            }
 
             _senderService.SendConfirmation(user.Email, ConfirmationCodeType.EmailChange);
         }

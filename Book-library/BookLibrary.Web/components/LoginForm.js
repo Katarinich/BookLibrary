@@ -23,8 +23,8 @@ export default class LoginForm extends Component {
     const { onSubmit, location, type, message } = this.props
 
     var formData = {
-      login: $('[name=login]').val(),
-      password: $('[name=password]').val()
+      login: $('[name=login]').val().trim(),
+      password: $('[name=password]').val().trim()
     }
 
     onSubmit(formData, location)

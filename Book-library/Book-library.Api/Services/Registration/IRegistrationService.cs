@@ -4,6 +4,6 @@ namespace BookLibrary.Api.Services
 {
     public interface IRegistrationService
     {
-        void RegisterUser(User user);
+        bool TryRegisterUser(User user);
     }
 }

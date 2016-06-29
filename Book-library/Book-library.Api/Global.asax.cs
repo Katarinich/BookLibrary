@@ -2,6 +2,7 @@
 using BookLibrary.Api.Managers;
 using BookLibrary.Api.Services;
 using BookLibrary.Api.Services.NotificationTransport;
+using BookLibrary.Api.Services.Validation;
 using SimpleInjector;
 using SimpleInjector.Integration.WebApi;
 using System.Web.Http;
@@ -36,6 +37,7 @@ namespace BookLibrary.Api
             container.Register<IPasswordChangeService, PasswordChangeService>(Lifestyle.Scoped);
             container.Register<IPasswordRecoveryService, PasswordRecoveryService>(Lifestyle.Scoped);
             container.Register<IPasswordPolicy, PasswordPolicy>(Lifestyle.Scoped);
+            container.Register<IValidationService, UserDraftValidationService>(Lifestyle.Scoped);
 
             container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
 

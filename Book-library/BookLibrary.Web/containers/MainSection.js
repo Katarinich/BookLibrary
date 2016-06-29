@@ -7,23 +7,17 @@ import UserGrid from '../components/UserGrid'
 import { getUsers } from '../actions'
 
 class MainSection extends Component {
-  componentDidMount() {
-    this.props.getUsers()
-  }
 
   render() {
     const { children } = this.props
     const { users, currentUser } = this.props.users
 
-    if(users) {
       return(
         <div>
           <Header user={ currentUser } />
-          { children ? children : <UserGrid users={ users } /> }
+          { children ? children : <UserGrid users={ users } onMount={this.props.getUsers}/> }
         </div>
       )
-    }
-    return (<div></div>)
   }
 }
 

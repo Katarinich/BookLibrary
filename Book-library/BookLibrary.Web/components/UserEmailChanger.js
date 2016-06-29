@@ -75,7 +75,7 @@ export default class UserEmailChanger extends Component {
 
   render() {
     return(
-      <div className="form-group">
+      <div className="form-group has-success">
         <label className="col-sm-3 control-label">Email</label>
         { this.renderEmailSection() }
       </div>

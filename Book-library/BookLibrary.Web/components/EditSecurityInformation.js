@@ -1,14 +1,47 @@
 import React, { Component } from 'react'
-import { Button, FormGroup, FormControl, ControlLabel } from 'react-bootstrap'
+import { Button, FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap'
 
 export default class EditSecurityInformation extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      errors: []
+    }
+  }
+
   handleSubmit(e) {
     e.preventDefault()
 
     var oldPasswordValue = $('[name=password]').val()
     var newPasswordValue = $('[name=newPassword]').val()
+    var newPasswordValueConfirmed = $('[name=newPasswordConfirmed]').val()
 
-    this.props.onSubmit(oldPasswordValue, newPasswordValue)
+    if(newPasswordValue == newPasswordValueConfirmed) {
+      this.props.onSubmit(oldPasswordValue.trim(), newPasswordValue.trim())
+      this.setState({ errors: [] })
+    }
+    else {
+      this.setState({
+        errors: [
+          { property: 'newPasswordConfirmed', message: 'Confirmed password should be match with new password.' }
+        ]
+      })
+    }
+  }
+
+  getValidationState(property) {
+    const { errors } = this.state
+
+    var result = errors.find(x => x.property == property)
+    return result ? 'error' : 'success'
+  }
+
+  getValidationMessage(property) {
+    const { errors } = this.state
+
+    var result = errors.find(x => x.property == property)
+    return result ? result.message : null
   }
 
   render() {
@@ -33,17 +66,18 @@ export default class EditSecurityInformation extends Component {
             </div>
           </FormGroup>
 
-          <FormGroup>
+          <FormGroup validationState={ this.getValidationState('newPasswordConfirmed') }>
             <ControlLabel bsClass="control-label col-sm-3">New Password</ControlLabel>
             <div className="col-sm-9">
               <FormControl type="password" name="newPassword" />
             </div>
           </FormGroup>
 
-          <FormGroup>
+          <FormGroup validationState={ this.getValidationState('newPasswordConfirmed') }>
             <ControlLabel bsClass="control-label col-sm-3">Confirm New Password</ControlLabel>
             <div className="col-sm-9">
               <FormControl type="password" name="newPasswordConfirmed" />
+              { this.getValidationMessage('newPasswordConfirmed') && <HelpBlock>{this.getValidationMessage('newPasswordConfirmed')}</HelpBlock> }
             </div>
           </FormGroup>
 

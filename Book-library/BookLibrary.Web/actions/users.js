@@ -278,7 +278,8 @@ export function registerUser(user) {
     })
     .catch(err => {
       dispatch(registerUserFailure(err))
-      dispatch(showResponseMessage(err.message, 'danger'))
+      if(typeof err == 'array') dispatch(showResponseMessage("Invalid form data.", 'danger'))
+      else dispatch(showResponseMessage(err, 'danger'))
     })
   }
 }
@@ -325,7 +326,10 @@ export function updateUser(user) {
 
       if(err == 403)
         dispatch(logoutUser())
-      else dispatch(showResponseMessage(err.message, 'danger'))
+      else {
+        if(typeof err == 'array') dispatch(showResponseMessage("Invalid form data.", 'danger'))
+        else dispatch(showResponseMessage(err.message, 'danger'))
+      }
     })
   }
 }
@@ -353,7 +357,7 @@ export function initiateUserEmailChange(newEmailValue) {
     dispatch(initiateUserEmailChangeRequest())
     let { token } = getState().users
 
-    return request('post', {...{newEmailValue: newEmailValue, userId: user.id}}, `${apiUrl}/email/change/initiate`, token)
+    return request('post', {...{email: newEmailValue, userId: user.id}}, `${apiUrl}/email/change/initiate`, token)
     .then(res => {
       dispatch(initiateUserEmailChangeSuccess(res))
 

@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react'
 import { Button, FormGroup, FormControl, ControlLabel, HelpBlock } from 'react-bootstrap'
-import revalidator from 'revalidator'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import moment from 'moment'
 
+import { validateUserDraft } from '../utils/validation'
 import HttpResponseMessage from './HttpResponseMessage'
 
 export default class RegistrationForm extends Component {
@@ -21,48 +21,32 @@ export default class RegistrationForm extends Component {
 
     const { onSubmit } = this.props
 
-    var schema = {
-      "type": "object",
-      "properties": {
-        "userName": {"type": "string", "pattern": "^[a-zA-Z0-9_-]{3,16}$", "messages": {"pattern": "UserName can contain only letters and numbers."}},
-        "firstName": {"type": "string", "pattern": "^.+$", "messages": {"pattern": "First name can't be empty."}},
-        "lastName": {"type": "string", "pattern": "^.+$", "messages": {"pattern": "Last name can't be empty."}},
-        "email": {"type": "string", "pattern": "^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$", "messages": {"pattern": "Email is not valid."}},
-        "dateOfBirth": {"type": "integer", "maximum": new Date().getTime() / 1000, "messages": {"maximum": "Date of birth is not valid."}},
-        "mobilePhone": {"type": "string", "pattern": "^(\\+|\\d)[0-9]{7,16}$", "messages": {"pattern": "Mobile phone is not valid."}},
-        "country": {"type": "string", "pattern": "^[a-zA-Z ]{3,16}$", "messages": {"pattern": "Country can contain only letters."}},
-        "state": {"type": "string"},
-        "city": {"type": "string", "pattern": "^[a-zA-Z ]{3,16}$", "messages": {"pattern": "City can contain only letters."}},
-        "addressLine": {"type": "string", "pattern": "^.+$"},
-        "zipcode": {"type": "string", "pattern": "^.+$"},
-        "password": {"type": "string", "pattern": "^[a-zA-Z0-9_-]{8,18}$", "messages": {"pattern": "Password can contain only letters and numbers and contains from 8 to 18 characters."}}
-      }
-    }
+    var passwordConfirmedValue = $('[name=passwordConfirmed]').val()
 
     var formData = {
-      userName: $('[name=userName]').val(),
-      firstName: $('[name=firstName]').val(),
-      lastName: $('[name=lastName]').val(),
-      email: $('[name=email]').val(),
+      userName: $('[name=userName]').val().trim(),
+      firstName: $('[name=firstName]').val().trim(),
+      lastName: $('[name=lastName]').val().trim(),
+      email: $('[name=email]').val().trim(),
       dateOfBirth: new Date($('[name=dateOfBirth]').val()).getTime() / 1000,
-      mobilePhone: $('[name=mobilePhone]').val(),
-      country: $('[name=country]').val(),
-      state: $('[name=state]').val(),
-      city: $('[name=city]').val(),
-      addressLine: $('[name=addressLine]').val(),
-      zipcode: $('[name=zipcode]').val(),
-      password: $('[name=password]').val()
+      mobilePhone: $('[name=mobilePhone]').val().trim(),
+      country: $('[name=country]').val().trim(),
+      state: $('[name=state]').val().trim(),
+      city: $('[name=city]').val().trim(),
+      addressLine: $('[name=addressLine]').val().trim(),
+      zipcode: $('[name=zipcode]').val().trim(),
+      password: $('[name=password]').val().trim()
     }
 
-    console.log(revalidator.validate(formData, schema))
-
-    let validation = revalidator.validate(formData, schema)
+    let validation = validateUserDraft(formData)
 
     if(validation.errors.length == 0) {
-      //onSubmit(formData)
+      if(passwordConfirmedValue == formData.password)
+        onSubmit(formData)
+      else validation.errors.push({ property: 'passwordConfirmed', message: 'Passwords should match.' })
     }
-    this.setState({errors: validation.errors})
 
+    this.setState({errors: validation.errors})
   }
 
   componentWillUnmount() {
@@ -178,6 +162,12 @@ export default class RegistrationForm extends Component {
             <div className="col-sm-10 col-sm-offset-1">
               <FormControl type="password" name="password" defaultValue="12345678" />
               <HelpBlock>Password can contain only letters and numbers and contains from 8 to 18 characters.</HelpBlock>
+            </div>
+          </FormGroup>
+          <FormGroup validationState={ this.getValidationState('passwordConfirmed') }>
+            <div className="col-sm-10 col-sm-offset-1">
+              <FormControl type="password" name="passwordConfirmed" defaultValue="12345678" />
+              { this.getValidationMessage('passwordConfirmed') && <HelpBlock>{this.getValidationMessage('passwordConfirmed')}</HelpBlock> }
             </div>
           </FormGroup>
           <Button type="submit">

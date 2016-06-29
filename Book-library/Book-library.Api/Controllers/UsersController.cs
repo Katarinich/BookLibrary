@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 using BookLibrary.Api.Exceptions;
 using BookLibrary.Api.Exceptions.CodeExceptions;
 using BookLibrary.Api.Exceptions.PasswordExceptions;
-using Book_library.Api.Exceptions;
+using BookLibrary.Api.Services.Validation;
 
 namespace BookLibrary.Api.Controllers
 {
@@ -27,10 +27,11 @@ namespace BookLibrary.Api.Controllers
         private IEmailConfirmationService _emailConfirmationService;
         private IPasswordChangeService _passwordChangeService;
         private IPasswordRecoveryService _passwordRecoveryService;
+        private IValidationService _userDraftValidationService;
 
         public UsersController(IUserService userService, IRegistrationService registrationalService, IConfirmationSenderService confirmationalService,
             IAuthentificationService authentificationSerice, IJwtService jwtService, IEmailChangeService emailChangeService, IEmailConfirmationService emailConfirmationService,
-            IPasswordChangeService passwordChangeService, IPasswordRecoveryService passwordRecoveryService)
+            IPasswordChangeService passwordChangeService, IPasswordRecoveryService passwordRecoveryService, IValidationService userDraftValidationService)
         {
             _emailChangeService = emailChangeService;
             _userService = userService;
@@ -41,6 +42,7 @@ namespace BookLibrary.Api.Controllers
             _emailConfirmationService = emailConfirmationService;
             _passwordChangeService = passwordChangeService;
             _passwordRecoveryService = passwordRecoveryService;
+            _userDraftValidationService = userDraftValidationService;
         }
 
         [Route("")]
@@ -82,25 +84,39 @@ namespace BookLibrary.Api.Controllers
 
         [Route("signup")]
         [HttpPost]
-        public IHttpActionResult Register(UserDraft userDraft)
+        public HttpResponseMessage Register(JObject userObject)
         {
+            IList<string> errorMessages;
+
+            if (!_userDraftValidationService.IsValid(userObject, out errorMessages))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errorMessages);
+            }
+
+            var userDraft = userObject.ToObject<UserDraft>();
+
             string[] logins = { userDraft.email, userDraft.userName, userDraft.mobilePhone };
 
-            var existingUser = _userService.GetUserByLogins(logins);
-
-            if (existingUser != null)
+            try
             {
-                return BadRequest("User already exist.");
+                _userService.CheckIfUserExistByLogin(logins);
+            }
+            catch(UserAlreadyExistException ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message);
             }
 
             var userBuilder = new UserBuilder();
             var user = userBuilder.BuildUser(userDraft);
 
-            _registrationService.RegisterUser(user);
+            if(!_registrationService.TryRegisterUser(user))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, "User with this email already exist");
+            }
 
             _confirmationSenderService.SendConfirmation(userDraft.email, ConfirmationCodeType.EmailConfirmation);
 
-            return Ok("Registration has complete.");
+            return Request.CreateResponse(HttpStatusCode.OK, "Registration has complete. Email with confiramtion code was sended on your email address. Please, confirm you address to login in system.");
         }
 
         [Route("signin")]
@@ -108,7 +124,8 @@ namespace BookLibrary.Api.Controllers
         {
             var user = _autentificationService.Authentificate(credentialsDraft);
 
-            if (user == null || user.Email == null) return Request.CreateResponse(HttpStatusCode.BadRequest, "Wrong login or password.");
+            if (user == null) return Request.CreateResponse(HttpStatusCode.BadRequest, "Wrong login or password.");
+            else if (user.Email == null) return Request.CreateResponse(HttpStatusCode.BadRequest, "Sorry, you can't login. You didn't confirm your email address.");
 
             var token = _jwtService.CreateToken(user.UserId);
 
@@ -137,29 +154,57 @@ namespace BookLibrary.Api.Controllers
         }
 
         [Route("update")]
-        public HttpResponseMessage UpdateUser(HttpRequestMessage request, UserDraft userDraft)
+        public HttpResponseMessage UpdateUser(HttpRequestMessage request, JObject userObject)
         {
             if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
 
+            IList<string> errorMessages;
+
+            if (!_userDraftValidationService.IsValid(userObject, out errorMessages))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, errorMessages);
+            }
+
+            var userDraft = userObject.ToObject<UserDraft>();
+
             var tokenValue = request.Headers.Authorization.Scheme;
+            var userId = _jwtService.GetUserIdFromToken(tokenValue);
+            var token = _jwtService.CreateToken(userId);
 
             var userBuilder = new UserBuilder();
             var updatedUser = userBuilder.BuildUser(userDraft);
+            var userToUpdate = _userService.GetUserByLogin(updatedUser.Emails.First().Value);
 
-            User user;
-            var userId = _jwtService.GetUserIdFromToken(tokenValue);
-
-            var token = _jwtService.CreateToken(userId);
-
-            try
+            if(userToUpdate.UserName != updatedUser.UserName ) 
             {
-                user = _userService.UpdateUser(updatedUser);
+                string[] logins = { userDraft.userName };
+
+                try
+                {
+                    _userService.CheckIfUserExistByLogin(logins);
+                }
+                catch (UserAlreadyExistException ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
+                }
             }
-            catch(LoginsAreNotUniqException ex)
+
+            if(userToUpdate.MobilePhone.Value != updatedUser.MobilePhone.Value)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
+                string[] logins = { userDraft.mobilePhone };
+
+                try
+                {
+                    _userService.CheckIfUserExistByLogin(logins);
+                }
+                catch (UserAlreadyExistException ex)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message, token = token });
+                }
             }
+
+            User user = _userService.UpdateUser(userToUpdate, updatedUser);
 
             var userDTO = new UserDTO()
             {
@@ -197,9 +242,15 @@ namespace BookLibrary.Api.Controllers
             if (request.Headers.Authorization == null || !_jwtService.ValidateToken(request.Headers.Authorization.Scheme))
                 return Request.CreateResponse(HttpStatusCode.Forbidden, "Not authorized!");
 
+            IList<string> errorMessages;
             var userId = (int)user["userId"];
-            var newEmailValue = user["newEmailValue"].ToString();
+            var newEmailValue = user["email"].ToString();
             var token = _jwtService.CreateToken(userId);
+
+            if (!_userDraftValidationService.IsValid(user, out errorMessages))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = "Email is invalid.", token = token });
+            }
 
             try
             {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Book_library.Api.Properties {
+namespace BookLibrary.Api.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
