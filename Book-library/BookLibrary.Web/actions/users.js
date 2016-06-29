@@ -142,14 +142,16 @@ function initiateUserEmailChangeRequest() {
 function initiateUserEmailChangeSuccess(response) {
   return {
     type: types.INITIATE_USER_EMAIL_CHANGE_SUCCESS,
-    pendingEmail: response.pendingEmail
+    pendingEmail: response.pendingEmail,
+    token: response.token
   }
 }
 
 function initiateUserEmailChangeFailure(err) {
   return {
     type: types.INITIATE_USER_EMAIL_CHANGE_FAILURE,
-    err
+    err: err.message,
+    token: err.token
   }
 }
 
@@ -236,16 +238,18 @@ function passwordChangeRequest(){
   }
 }
 
-function passwordChangeSuccess(){
+function passwordChangeSuccess(response){
   return {
-    type: types.PASSWORD_CHANGE_SUCCESS
+    type: types.PASSWORD_CHANGE_SUCCESS,
+    token: response.token
   }
 }
 
 function passwordChangeFailure(err){
   return {
     type: types.PASSWORD_CHANGE_FAILURE,
-    err
+    err: err.message,
+    token: err.token
   }
 }
 

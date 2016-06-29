@@ -13,7 +13,7 @@ namespace BookLibrary.Api.Services
         public string CreateToken(int userId)
         {
             var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddHours(2) - unixEpoch).TotalSeconds);
+            var expiry = Math.Round((DateTime.UtcNow.AddSeconds(30) - unixEpoch).TotalSeconds);
 
             var payload = new Dictionary<string, object>
             {

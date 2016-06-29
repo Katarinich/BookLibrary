@@ -21,7 +21,8 @@ export default function user(state = { isFetching: false }, action) {
       return {
         ...state,
         currentUser: {...state.currentUser, pendingEmail: action.pendingEmail},
-        isFetching: false
+        isFetching: false,
+        token: action.token
       }
     case types.LOGIN_USER_SUCCESS:
     case types.UPDATE_USER_SUCCESS:
@@ -42,12 +43,17 @@ export default function user(state = { isFetching: false }, action) {
      return {
        isFetching: false
      }
+    case types.PASSWORD_CHANGE_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        token: action.token
+      }
     case types.REGISTER_USER_SUCCESS:
     case types.CONFIRM_EMAIL_SUCCESS:
     case types.CONTINUE_EMAIL_CHANGE_SUCCESS:
     case types.INITIATE_PASSWORD_RECOVERY_SUCCESS:
     case types.FINISH_PASSWORD_RECOVERY_SUCCESS:
-    case types.PASSWORD_CHANGE_SUCCESS:
       return {
         ...state,
         isFetching: false
@@ -59,17 +65,23 @@ export default function user(state = { isFetching: false }, action) {
         users: action.users,
         token: action.token
       }
+    case types.UPDATE_USER_FAILURE:
+    case types.INITIATE_USER_EMAIL_CHANGE_FAILURE:
+    case types.PASSWORD_CHANGE_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        error: action.err,
+        token: action.token
+      }
     case types.GET_USERS_FAILURE:
     case types.LOGIN_USER_FAILURE:
     case types.REGISTER_USER_FAILURE:
-    case types.UPDATE_USER_FAILURE:
     case types.CONFIRM_EMAIL_FAILURE:
-    case types.INITIATE_USER_EMAIL_CHANGE_FAILURE:
     case types.CONTINUE_EMAIL_CHANGE_FAILURE:
     case types.FINISH_EMAIL_CHANGE_FAILURE:
     case types.INITIATE_PASSWORD_RECOVERY_FAILURE:
     case types.FINISH_PASSWORD_RECOVERY_FAILURE:
-    case types.PASSWORD_CHANGE_FAILURE:
       return {
         ...state,
         isFetching: false,

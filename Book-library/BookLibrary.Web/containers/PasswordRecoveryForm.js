@@ -3,10 +3,16 @@ import { connect } from 'react-redux'
 import { FormGroup, FormControl, Button } from 'react-bootstrap'
 import { Link } from 'react-router'
 
-import { finishPasswordRecovery, hideResponseMessage } from '../actions'
+import { finishPasswordRecovery, hideResponseMessage, logoutUser } from '../actions'
 import HttpResponseMessage from '../components/HttpResponseMessage'
 
 class PasswordRecoveryForm extends Component {
+  componentWillMount() {
+    const { currentUser } = this.props.users
+
+    if(currentUser) this.props.logoutUser()
+  }
+
   componentWillUnmount() {
     if(this.props.response.type) this.props.hideResponseMessage()
   }
@@ -60,4 +66,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps, { finishPasswordRecovery, hideResponseMessage })(PasswordRecoveryForm)
+export default connect(mapStateToProps, { finishPasswordRecovery, hideResponseMessage, logoutUser })(PasswordRecoveryForm)

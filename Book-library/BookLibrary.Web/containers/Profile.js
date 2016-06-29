@@ -1,11 +1,21 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import moment from 'moment'
 
 import ProfileViewer from '../components/ProfileViewer'
 import ProfileEditor from '../components/ProfileEditor'
-import { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage } from '../actions'
+import { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage, logoutUser } from '../actions'
+import getDecodedTokenData from '../actions/utils/decode-token'
 
 class Profile extends Component {
+  componentWillMount() {
+    const { token } = this.props.users
+
+    if(moment.unix(getDecodedTokenData(token).expiryDate).isBefore(moment())) {
+      this.props.logoutUser()
+    }
+  }
+
   render() {
     const { currentUser, users } = this.props.users
     const { type, message } = this.props.response
@@ -32,4 +42,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps, { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage })(Profile)
+export default connect(mapStateToProps, { updateUser, initiateUserEmailChange, passwordChange, hideResponseMessage, logoutUser })(Profile)

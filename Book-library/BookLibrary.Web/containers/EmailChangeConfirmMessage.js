@@ -1,10 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { finishEmailChange, hideResponseMessage } from '../actions'
+import { finishEmailChange, hideResponseMessage, logoutUser } from '../actions'
 import HttpResponseMessage from '../components/HttpResponseMessage'
 
 class EmailChangeConfirmMessage extends Component {
+  componentWillMount() {
+    const { currentUser } = this.props.users
+
+    if(currentUser) this.props.logoutUser()
+  }
+
   componentDidMount() {
     this.props.finishEmailChange(this.props.params.codeValue)
   }
@@ -31,4 +37,4 @@ function mapStateToProps(state) {
   return state
 }
 
-export default connect(mapStateToProps, { finishEmailChange, hideResponseMessage })(EmailChangeConfirmMessage)
+export default connect(mapStateToProps, { finishEmailChange, hideResponseMessage, logoutUser })(EmailChangeConfirmMessage)

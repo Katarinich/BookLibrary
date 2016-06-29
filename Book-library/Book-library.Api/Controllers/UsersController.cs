@@ -116,7 +116,7 @@ namespace BookLibrary.Api.Controllers
 
             _confirmationSenderService.SendConfirmation(userDraft.email, ConfirmationCodeType.EmailConfirmation);
 
-            return Request.CreateResponse(HttpStatusCode.OK, "Registration has complete. Email with confiramtion code was sended on your email address. Please, confirm you address to login in system.");
+            return Request.CreateResponse(HttpStatusCode.OK, "Registration has complete. Email with confirmation code was sended on your email address. Please, confirm you address to login in system.");
         }
 
         [Route("signin")]

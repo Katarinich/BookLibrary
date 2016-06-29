@@ -83,7 +83,7 @@ export default class RegistrationForm extends Component {
       <div>
         { type && <HttpResponseMessage type={ type } message={ message } /> }
 
-        <form onSubmit={ e => this.handleSubmit(e) } >
+        { !type || type == 'danger' ? <form onSubmit={ e => this.handleSubmit(e) } >
           <FormGroup validationState={ this.getValidationState('userName') }>
             <div className="col-sm-10 col-sm-offset-1">
               <FormControl type="text" name="userName" defaultValue="JaneDoe" />
@@ -173,7 +173,7 @@ export default class RegistrationForm extends Component {
           <Button type="submit">
             Sign Up
           </Button>
-        </form>
+        </form> : ""}
       </div>
     )
   }
